@@ -35,6 +35,14 @@ After configuring and starting ServerMon, the data can be viewed as graphs in a 
 - `{servermon_domain}/monitors` will show a list of monitors configured
 - `{servermon_domain}/ping/{internal_id}` will show a graph of data collected for that monitor
 
+By default, data from the past 24 hours is shown. The amount of data shown can be customised using query parameters:
+
+- Hours: `?h=2` will show 2 hours of data. You can change this to get up to 24 hours of data
+- Days: `?d=5` will show 5 days of data. You can change this to get up to 30 days of data
+
+Currently, these cannot both be used at the same time.
+
+
 # License
 
 MIT License
