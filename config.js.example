@@ -1,0 +1,18 @@
+var config = {
+	monitors: {
+		'uk-prod-lb-01': {
+			name: 'UK Loadbalancer 01',
+			ip: '198.51.100.21',
+			port: '443',
+			cron: '*/2 * * * *'
+		},
+		'uk-prod-lb-02': {
+			name: 'UK Loadbalancer 02',
+			ip: '198.51.100.31',
+			port: '443',
+			cron: '*/2 * * * *'
+		}
+	}
+};
+
+module.exports = config;

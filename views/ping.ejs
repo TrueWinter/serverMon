@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Ping</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css" />
+		<meta charset="UTF-8" />
+		<style>
+			@media only screen and (min-width: 576px) {
+				.main-content {
+					width:520px;
+					margin:auto;
+				}
+			}
+			@media only screen and (min-width: 768px) {
+				.main-content {
+					width: 700px;
+					margin:auto;
+				}
+			}
+			@media only screen and (min-width: 992px) {
+				.main-content {
+					width: 920px;
+					margin:auto;
+				}
+			}
+			@media only screen and (min-width: 1200px) {
+				.main-content {
+					width: 1100px;
+					margin:auto;
+				}
+			}
+			h1 {
+				text-align: center;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="main-content">
+			<h1>Ping Data for <b><%= name %></b></h1>
+			<canvas id="Chart1" style="max-height: 550px; display: block; width: 1100px; height: 550px;"></canvas>
+		</div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+		<script>
+			var data = <%- JSON.stringify(data) %>;
+			
+			var lineChartData = {
+				labels: [],
+				datasets: [
+					{
+						label: 'Average',
+						borderColor: 'cyan',
+						backgroundColor: 'transparent',
+						spanGaps: false,
+						data: []
+					},
+					{
+						label: 'Max',
+						borderColor: 'purple',
+						backgroundColor: 'transparent',
+						spanGaps: false,
+						data: []
+					},
+					{
+						label: 'Min',
+						borderColor: 'green',
+						backgroundColor: 'transparent',
+						spanGaps: false,
+						data: []
+					}
+				]
+			};
+
+			for (var i = 0; i < data.length; i++) {
+				var timestamp = data[i].timestamp * 1000;
+				lineChartData.labels.push(timestamp);
+				lineChartData.datasets[0].data.push({x: timestamp, y: data[i].average});
+				lineChartData.datasets[1].data.push({x: timestamp, y: data[i].max});
+				lineChartData.datasets[2].data.push({x: timestamp, y: data[i].min});
+			}
+
+			ctx = document.getElementById("Chart1").getContext("2d");
+			var myLineChart = new Chart(ctx, {
+				type: 'line',
+				data: lineChartData,
+				options: {
+					animation: false,
+					maintainAspectRatio: false,
+					scales: {
+						xAxes: [{
+							type: 'time',
+							time: {
+								tooltipFormat: 'll HH:mm'
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'Time'
+							}
+						}],
+						yAxes: [{
+							scaleLabel: {
+								display: true,
+								labelString: 'Response Time'
+							}
+						}]
+					}
+				}
+			});
+		</script>
+	</body>
+</html>
