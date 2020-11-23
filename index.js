@@ -1,6 +1,5 @@
 var tcpp = require('tcp-ping'); // tcp-ping as it's the only library i found that returns decimals as part of the ping data
 var express = require('express');
-var morgan = require('morgan');
 var cron = require('node-cron');
 
 var app = express();
@@ -45,7 +44,6 @@ for (var monitor in config.monitors) {
 // Server
 
 app.set('view engine', 'ejs');
-app.use(morgan('combined'));
 
 app.get('/ping/:monitor', function(req, res) {
 	if (!Object.prototype.hasOwnProperty.call(config.monitors, req.params.monitor)) {
