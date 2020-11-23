@@ -46,7 +46,6 @@ for (var monitor in config.monitors) {
 
 app.set('view engine', 'ejs');
 app.use(morgan('combined'));
-app.use('/assets', express.static('assets'));
 
 app.get('/ping/:monitor', function(req, res) {
 	if (!Object.prototype.hasOwnProperty.call(config.monitors, req.params.monitor)) {
