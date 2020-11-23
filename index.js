@@ -12,7 +12,7 @@ var config = require('./config.js');
 function ping(monitor, host, port, cb) {
 	tcpp.ping({ address: host, port: port, attempts: 5 }, function(err, data) {
 		if (err) {
-			throw new Error(`Unable to ping ${monitor}: ${err}`)
+			throw new Error(`Unable to ping ${monitor}: ${err}`);
 		}
 		console.log(data);
 
