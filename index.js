@@ -1,11 +1,44 @@
-var tcpp = require('tcp-ping'); // tcp-ping as it's the only library i found that returns decimals as part of the ping data
+var tcpp = require('tcp-ping'); // tcp-ping as it's the only library i found that returns decimals as part of the ping data. will be changed in the future
 var express = require('express');
 var cron = require('node-cron');
-
-var app = express();
+var Push = require('pushover-notifications');
+var Webhook = require('discord-webhook-node').Webhook;
 
 var db = require('./db.js');
 var config = require('./config.js');
+
+var app = express();
+var hook = new Webhook(config.notifications.discord);
+
+function round(int) {
+	return Math.round(int * 1000) / 1000; // Rounds to 3 decimal places
+}
+
+function notify(monitor, event) {
+	if (config.notifications.pushover.user && config.notifications.pushover.token) {
+		var p = new Push({
+			user: config.notifications.pushover.user,
+			token: config.notifications.pushover.token
+		});
+
+		var msg = {
+			message: `New event from ServerMon: ${monitor} is ${event}`,
+			priority: config.notifications.pushover.priority || 0
+		};
+
+		p.send(msg, function(err, result) {
+			if (err) {
+				throw err;
+			}
+
+			console.log(result);
+		});
+	}
+
+	if (config.notifications.discord) {
+		hook.send(`New event from ServerMon: ${monitor} is ${event}`);
+	}
+}
 
 // Ping
 
@@ -17,11 +50,21 @@ function ping(monitor, host, port, cb) {
 		console.log(data);
 
 		if (!data.avg) {
-			db.insertPingResults(0, 0, 0, monitor);
+			db.insertPingResults(null, null, null, monitor);
+			if (config.monitors[monitor].up) {
+				notify(monitor, 'down');
+			}
+
+			config.monitors[monitor].up = false;
 			return cb(`Unable to ping ${host}`, null);
 		}
 
-		db.insertPingResults(data.avg, data.max, data.min, monitor);
+		if (!config.monitors[monitor].up) {
+			notify(monitor, 'up');
+		}
+		config.monitors[monitor].up = true;
+
+		db.insertPingResults(round(data.avg), round(data.max), round(data.min), monitor);
 		return cb(null, `Monitor: ${monitor} | Minimum: ${data.min} | Maximum: ${data.max} | Average: ${data.avg}`);
 	});
 }
@@ -30,6 +73,7 @@ for (var monitor in config.monitors) {
 	// https://dzone.com/articles/why-does-javascript-loop-only-use-last-value
 	let mon = monitor;
 	console.log(monitor);
+	config.monitors[mon].up = true;
 	cron.schedule(config.monitors[mon].cron, function() {
 		console.log(mon);
 		ping(mon, config.monitors[mon].ip, config.monitors[mon].port, function(err, data) {

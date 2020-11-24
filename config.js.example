@@ -12,6 +12,14 @@ var config = {
 			port: '443',
 			cron: '*/2 * * * *'
 		}
+	},
+	notifications: {
+		discord: '',
+		pushover: {
+			user: '',
+			token: '',
+			priority: 0
+		}
 	}
 };
 

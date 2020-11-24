@@ -71,12 +71,16 @@
 				]
 			};
 
+			function round(int) {
+				return Math.round(int * 1000) / 1000;
+			}
+
 			for (var i = 0; i < data.length; i++) {
 				var timestamp = data[i].timestamp * 1000;
 				lineChartData.labels.push(timestamp);
-				lineChartData.datasets[0].data.push({x: timestamp, y: data[i].average});
-				lineChartData.datasets[1].data.push({x: timestamp, y: data[i].max});
-				lineChartData.datasets[2].data.push({x: timestamp, y: data[i].min});
+				lineChartData.datasets[0].data.push({ x: timestamp, y: data[i].average });
+				lineChartData.datasets[1].data.push({ x: timestamp, y: data[i].max });
+				lineChartData.datasets[2].data.push({ x: timestamp, y: data[i].min });
 			}
 
 			ctx = document.getElementById("Chart1").getContext("2d");
@@ -86,6 +90,10 @@
 				options: {
 					animation: false,
 					maintainAspectRatio: false,
+					tooltips: {
+						mode: 'index',
+						axis: 'y'
+					},
 					scales: {
 						xAxes: [{
 							type: 'time',
