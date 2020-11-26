@@ -20,7 +20,10 @@ var config = {
 			token: '',
 			priority: 0
 		}
-	}
+	},
+	customLogic: {
+		auth: ''
+	} 
 };
 
 module.exports = config;
