@@ -6,6 +6,10 @@
 	</head>
 	<body>
 		<h1>Monitors</h1>
+		<% if (customLogin) { %>
+			<a href="/logout">Logout</a>
+		<% } %>
+		<hr />
 		<% for (var monitor in monitors) { %>
 		<div>
 			<a href="/ping/<%= monitor %>"><%= monitor %></a>

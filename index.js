@@ -1,6 +1,8 @@
 var tcpp = require('tcp-ping'); // tcp-ping as it's the only library i found that returns decimals as part of the ping data. will be changed in the future
 var express = require('express');
 var cron = require('node-cron');
+var path = require('path');
+var fs = require('fs');
 var Push = require('pushover-notifications');
 var Webhook = require('discord-webhook-node').Webhook;
 
@@ -12,6 +14,14 @@ var hook = new Webhook(config.notifications.discord);
 
 function round(int) {
 	return Math.round(int * 1000) / 1000; // Rounds to 3 decimal places
+}
+
+if (config.customLogic.auth) {
+	if (fs.existsSync(path.join(__dirname, config.customLogic.auth))) {
+		require(`./${config.customLogic.auth}`)(app);
+	} else {
+		console.error(`Custom logic file for auth does not exist at ${path.join(__dirname, config.customLogic.auth)}`);
+	}
 }
 
 function notify(monitor, event) {
@@ -89,6 +99,10 @@ for (var monitor in config.monitors) {
 
 app.set('view engine', 'ejs');
 
+app.get('/', function(req, res) {
+	res.redirect('/monitors');
+});
+
 app.get('/ping/:monitor', function(req, res) {
 	if (!Object.prototype.hasOwnProperty.call(config.monitors, req.params.monitor)) {
 		return res.end('Invalid monitor');
@@ -106,12 +120,12 @@ app.get('/ping/:monitor', function(req, res) {
 			throw new Error(err);
 		}
 
-		res.render('ping', { name: config.monitors[req.params.monitor].name, data: data });
+		res.render('ping', { name: config.monitors[req.params.monitor].name, data: data, customLogin: config.customLogic.auth ? true : false });
 	});
 });
 
 app.get('/monitors', function(req, res) {
-	res.render('monitors', { monitors: config.monitors });
+	res.render('monitors', { monitors: config.monitors, customLogin: config.customLogic.auth ? true : false });
 });
 
 app.listen(18514, function() {

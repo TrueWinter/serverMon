@@ -30,11 +30,43 @@ Configuring the notifications object in the config file will allow you to receiv
 
 It is recommended to use a proxy such as Nginx to proxy port 80 and 443 to ServerMon's port (18514).
 
+# Advanced Configuration (Optional)
+
+Some people may want to restrict access to ServerMon. To allow (almost) full control over this, authentication is handled through custom logic.
+
+Enter a file name relative to the current directory in the config file at `customLogic.auth`. This file should handle sessions and login forms (or redirecting to an SSO provider, if one is used) and all other aspects of the login system.
+
+This file will be required in the main file passing the Express app as a parameter. Your file should look something like the following:
+
+```js
+function auth(app) {
+	app.use('/monitors', authMiddleware);
+	app.use('/app/*', authMiddleware);
+
+	function authMiddleware(req res, next) {
+		// An Express middleware to handle logins
+	}
+
+	app.get('/login', function(req, res) {
+		// Show login form
+	});
+
+	// Include all code needed for a login system here
+}
+
+module.exports = app;
+```
+
+There are a few restrictions:
+
+- You do not have access to the ServerMon database
+- The logout route must be `/logout` as this is what will be used for the logout link on the monitors page
+
 # Usage
 
 After configuring and starting ServerMon, the data can be viewed as graphs in a browser.
 
-- `{servermon_domain}/monitors` will show a list of monitors configured
+- `{servermon_domain}/monitors` will show a list of monitors configured (visiting `${servermon_domain}/` will redirect here)
 - `{servermon_domain}/ping/{internal_id}` will show a graph of data collected for that monitor
 
 By default, data from the past 24 hours is shown. The amount of data shown can be customised using query parameters:
