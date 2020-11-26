@@ -41,7 +41,7 @@ This file will be required in the main file passing the Express app as a paramet
 ```js
 function auth(app) {
 	app.use('/monitors', authMiddleware);
-	app.use('/app/*', authMiddleware);
+	app.use('/ping/*', authMiddleware);
 
 	function authMiddleware(req res, next) {
 		// An Express middleware to handle logins
