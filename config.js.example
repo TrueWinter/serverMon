@@ -3,14 +3,20 @@ var config = {
 		'uk-prod-lb-01': {
 			name: 'UK Loadbalancer 01',
 			ip: '198.51.100.21',
-			port: '443',
-			cron: '*/2 * * * *'
+			cron: '*/2 * * * *',
+			notify: ['discord', 'pushover']
 		},
 		'uk-prod-lb-02': {
 			name: 'UK Loadbalancer 02',
 			ip: '198.51.100.31',
-			port: '443',
-			cron: '*/2 * * * *'
+			cron: '*/2 * * * *',
+			notify: ['discord', 'pushover']
+		},
+		'uk-dev-lb-01': {
+			name: 'UK Loadbalancer 02',
+			ip: '198.51.100.95',
+			cron: '*/5 * * * *',
+			notify: ['discord']
 		}
 	},
 	notifications: {

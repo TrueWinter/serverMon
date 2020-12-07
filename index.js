@@ -1,4 +1,4 @@
-var tcpp = require('tcp-ping'); // tcp-ping as it's the only library i found that returns decimals as part of the ping data. will be changed in the future
+var pingModule = require('ping');
 var express = require('express');
 var cron = require('node-cron');
 var path = require('path');
@@ -13,7 +13,8 @@ var app = express();
 var hook = new Webhook(config.notifications.discord);
 
 function round(int) {
-	return Math.round(int * 1000) / 1000; // Rounds to 3 decimal places
+	return int;
+	//return Math.round(int * 1000) / 1000; // Rounds to 3 decimal places
 }
 
 if (config.customLogic.auth) {
@@ -25,7 +26,7 @@ if (config.customLogic.auth) {
 }
 
 function notify(monitor, event) {
-	if (config.notifications.pushover.user && config.notifications.pushover.token) {
+	if (config.notifications.pushover.user && config.notifications.pushover.token && config.monitors[monitor].notify.includes('pushover')) {
 		var p = new Push({
 			user: config.notifications.pushover.user,
 			token: config.notifications.pushover.token
@@ -45,21 +46,18 @@ function notify(monitor, event) {
 		});
 	}
 
-	if (config.notifications.discord) {
+	if (config.notifications.discord && config.monitors[monitor].notify.includes('discord')) {
 		hook.send(`New event from ServerMon: ${monitor} is ${event}`);
 	}
 }
 
 // Ping
 
-function ping(monitor, host, port, cb) {
-	tcpp.ping({ address: host, port: port, attempts: 5 }, function(err, data) {
-		if (err) {
-			throw new Error(`Unable to ping ${monitor}: ${err}`);
-		}
+function ping(monitor, host, cb) {
+	pingModule.promise.probe(host, { attempts: 5, min_reply: 5 }).then(function(data) {
 		console.log(data);
 
-		if (!data.avg) {
+		if (!data.alive) {
 			db.insertPingResults(null, null, null, monitor);
 			if (config.monitors[monitor].up) {
 				notify(monitor, 'down');
@@ -86,7 +84,7 @@ for (var monitor in config.monitors) {
 	config.monitors[mon].up = true;
 	cron.schedule(config.monitors[mon].cron, function() {
 		console.log(mon);
-		ping(mon, config.monitors[mon].ip, config.monitors[mon].port, function(err, data) {
+		ping(mon, config.monitors[mon].ip, function(err, data) {
 			if (err) {
 				return console.log(err);
 			}

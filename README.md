@@ -10,8 +10,8 @@ Add your servers into the monitors object in config file with the following info
 'internal-id': {
 	name: 'Name shown on status page',
 	ip: 'IP address (or domain name) of server',
-	port: 'An open port on the server',
-	cron: 'The monitor schedule in cron format'
+	cron: 'The monitor schedule in cron format',
+	notify: 'This is an array stating where notifications for this monitor are sent'
 }
 ```
 
@@ -21,8 +21,8 @@ Example:
 'uk-prod-lb-01': {
 	name: 'UK Loadbalancer 01',
 	ip: '198.51.100.21',
-	port: '443',
-	cron: '*/2 * * * *'
+	cron: '*/2 * * * *',
+	notify: ['discord', 'pushover']
 }
 ```
 
