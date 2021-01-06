@@ -62,6 +62,8 @@ There are a few restrictions:
 - You do not have access to the ServerMon database
 - The logout route must be `/logout` as this is what will be used for the logout link on the monitors page
 
+An example has been included in `custom-logic-examples/simple-auth.js`.
+
 # Usage
 
 After configuring and starting ServerMon, the data can be viewed as graphs in a browser.

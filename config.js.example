@@ -13,7 +13,7 @@ var config = {
 			notify: ['discord', 'pushover']
 		},
 		'uk-dev-lb-01': {
-			name: 'UK Loadbalancer 02',
+			name: 'UK Dev Loadbalancer 01',
 			ip: '198.51.100.95',
 			cron: '*/5 * * * *',
 			notify: ['discord']
