@@ -161,6 +161,13 @@
 						]
 					};
 
+					if (value > 2 && unit === 'days') {
+						for (var i = 0; i < lineChartData.datasets.length; i++) {
+							lineChartData.datasets[i].pointRadius = 0;
+							lineChartData.datasets[i].pointHitRadius = 0;
+						}
+					}
+
 					function round(int) {
 						return Math.round(int * 1000) / 1000;
 					}
