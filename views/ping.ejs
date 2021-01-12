@@ -41,82 +41,180 @@
 			<h1>Ping Data for <b><%= name %></b></h1>
 			<a id="back" href="/monitors">Monitors</a>
 			<hr />
-			<canvas id="Chart1" style="max-height: 550px; display: block; width: 1100px; height: 550px;"></canvas>
+			Change graph time period:
+			<input type="text" id="timeValue" onkeydown="if (event.keyCode==13){formSubmitted()}" pattern="[0-9]{1,2}" maxlength="2" size="2" autocomplete="off" />
+			<select id="timeUnit" onkeydown="if (event.keyCode==13){formSubmitted()}" autocomplete="off">
+				<option value="hours">hours</option>
+				<option value="days">days</option>
+			</select>
+			<button type="button" id="loadBtn">Load</button>
+			<hr />
+			<div id="chartArea">
+				<canvas id="Chart1" style="max-height: 550px; display: block; width: 1100px; height: 550px;"></canvas>
+			</div>
 		</div>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
 		<script>
-			var data = <%- JSON.stringify(data) %>;
-			
-			var lineChartData = {
-				labels: [],
-				datasets: [
-					{
-						label: 'Average',
-						borderColor: 'cyan',
-						backgroundColor: 'transparent',
-						spanGaps: false,
-						data: []
-					},
-					{
-						label: 'Max',
-						borderColor: 'purple',
-						backgroundColor: 'transparent',
-						spanGaps: false,
-						data: []
-					},
-					{
-						label: 'Min',
-						borderColor: 'green',
-						backgroundColor: 'transparent',
-						spanGaps: false,
-						data: []
+			function formSubmitted() {
+				var value = document.getElementById('timeValue').value;
+				var unit = document.getElementById('timeUnit').value;
+
+				if (!(value && unit)) {
+					return;
+				}
+
+				if (!value.match(/^[0-9]{1,2}$/)) {
+					return alert('Invalid value');
+				}
+
+				var units = ['hours', 'days'];
+
+				if (!units.includes(unit)) {
+					return alert('Invalid unit of time');
+				}
+
+				switch(unit) {
+					case 'hours':
+						if (value > 24 && value <= 0) {
+							return alert('Hour value must be more than 0 and less than 25');
+						}
+						break;
+					case 'days':
+						if (value > 30 && value <= 0) {
+							return alert('Day value must be more than 0 and less than 31');
+						}
+						break;
+				}
+
+				loadChart(parseInt(value), unit);
+			}
+
+			document.getElementById('loadBtn').addEventListener('click', function() {
+				formSubmitted();
+			});
+
+			function loadChart(value, unit) {
+				document.getElementById('chartArea').style.filter = 'blur(5px)';
+				function generateAPIURL(value, unit) {
+					var base = '/api/ping/<%= id %>';
+
+					if (!(value && unit)) {
+						return base;
 					}
-				]
-			};
 
-			function round(int) {
-				return Math.round(int * 1000) / 1000;
-			}
-
-			for (var i = 0; i < data.length; i++) {
-				var timestamp = data[i].timestamp * 1000;
-				lineChartData.labels.push(timestamp);
-				lineChartData.datasets[0].data.push({ x: timestamp, y: data[i].average });
-				lineChartData.datasets[1].data.push({ x: timestamp, y: data[i].max });
-				lineChartData.datasets[2].data.push({ x: timestamp, y: data[i].min });
-			}
-
-			ctx = document.getElementById("Chart1").getContext("2d");
-			var myLineChart = new Chart(ctx, {
-				type: 'line',
-				data: lineChartData,
-				options: {
-					animation: false,
-					maintainAspectRatio: false,
-					tooltips: {
-						mode: 'index',
-						axis: 'y'
-					},
-					scales: {
-						xAxes: [{
-							type: 'time',
-							time: {
-								tooltipFormat: 'll HH:mm'
-							},
-							scaleLabel: {
-								display: true,
-								labelString: 'Time'
+					switch(unit) {
+						case 'hours':
+							if (value < 24 && value > 0) {
+								return `${base}?h=${value}`;
+							} else {
+								return base;
 							}
-						}],
-						yAxes: [{
-							scaleLabel: {
-								display: true,
-								labelString: 'Response Time'
+							break;
+						case 'days':
+							if (value < 31 && value > 1) {
+								return `${base}?d=${value}`;
+							} else {
+								return base;
 							}
-						}]
+							break;
+						default:
+							return base;
 					}
 				}
+
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', generateAPIURL(value, unit));
+				xhr.onload = function() {
+					var data = JSON.parse(this.responseText).data;
+
+					document.getElementById('chartArea').style.filter = '';
+
+					if (window.lc) {
+						lc.destroy();
+					}
+			
+					var lineChartData = {
+						labels: [],
+						datasets: [
+							{
+								label: 'Average',
+								borderColor: 'cyan',
+								backgroundColor: 'transparent',
+								spanGaps: false,
+								data: []
+							},
+							{
+								label: 'Max',
+								borderColor: 'purple',
+								backgroundColor: 'transparent',
+								spanGaps: false,
+								data: []
+							},
+							{
+								label: 'Min',
+								borderColor: 'green',
+								backgroundColor: 'transparent',
+								spanGaps: false,
+								data: []
+							}
+						]
+					};
+
+					function round(int) {
+						return Math.round(int * 1000) / 1000;
+					}
+
+					for (var i = 0; i < data.length; i++) {
+						var timestamp = data[i].timestamp * 1000;
+						lineChartData.labels.push(timestamp);
+						lineChartData.datasets[0].data.push({ x: timestamp, y: data[i].average });
+						lineChartData.datasets[1].data.push({ x: timestamp, y: data[i].max });
+						lineChartData.datasets[2].data.push({ x: timestamp, y: data[i].min });
+					}
+
+					ctx = document.getElementById("Chart1").getContext("2d");
+					var pingLineChart = new Chart(ctx, {
+						type: 'line',
+						data: lineChartData,
+						options: {
+							animation: false,
+							maintainAspectRatio: false,
+							tooltips: {
+								mode: 'index',
+								axis: 'y'
+							},
+							scales: {
+								xAxes: [{
+									type: 'time',
+									time: {
+										tooltipFormat: 'll HH:mm'
+									},
+									scaleLabel: {
+										display: true,
+										labelString: 'Time'
+									}
+								}],
+								yAxes: [{
+									scaleLabel: {
+										display: true,
+										labelString: 'Response Time'
+									}
+								}]
+							}
+						}
+					});
+
+					window.lc = pingLineChart;
+				};
+				xhr.onerror = function() {
+					alert('An error occurred while loading ping data');
+				};
+				xhr.send();
+			}
+
+			window.addEventListener('load', function() {
+				loadChart();
 			});
 		</script>
 	</body>

@@ -29,6 +29,7 @@ function auth(app) {
 
 	app.use('/monitors', authMiddleware);
 	app.use('/ping/*', authMiddleware);
+	app.use('/api/*', authMiddleware);
 
 	app.get('/login', function(req, res) {
 		if (req.session && req.session.loggedIn) {
