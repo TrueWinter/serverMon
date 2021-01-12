@@ -96,6 +96,8 @@
 
 			function loadChart(value, unit) {
 				document.getElementById('chartArea').style.filter = 'blur(5px)';
+				document.getElementById('chartArea').style.pointerEvents = 'none';
+
 				function generateAPIURL(value, unit) {
 					var base = '/api/ping/<%= id %>';
 
@@ -129,6 +131,7 @@
 					var data = JSON.parse(this.responseText).data;
 
 					document.getElementById('chartArea').style.filter = '';
+					document.getElementById('chartArea').style.pointerEvents = '';
 
 					if (window.lc) {
 						lc.destroy();
