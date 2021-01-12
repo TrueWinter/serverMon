@@ -106,21 +106,6 @@ app.get('/ping/:monitor', function(req, res) {
 		return res.end('Invalid monitor');
 	}
 
-	/*var d = 1;
-	var h = 0;
-	if (req.query.d && req.query.d <= 30) d = req.query.d;
-	if (req.query.h && req.query.h <= 24) h = req.query.h;
-	if (h) d = h / 24;
-
-	db.getPingResults(d, req.params.monitor, function(err, data) {
-		if (err) {
-			res.end(`Error querying database: ${err}`);
-			throw new Error(err);
-		}
-
-		res.render('ping', { id: req.params.monitor, name: config.monitors[req.params.monitor].name, data: data, customLogin: config.customLogic.auth ? true : false });
-	});*/
-
 	res.render('ping', { id: req.params.monitor, name: config.monitors[req.params.monitor].name });
 });
 
