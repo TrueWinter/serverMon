@@ -160,7 +160,14 @@
 								backgroundColor: 'transparent',
 								spanGaps: false,
 								data: []
-							}
+							},
+							{
+								label: 'Time Period Average',
+								borderColor: 'pink',
+								backgroundColor: 'transparent',
+								spanGaps: false,
+								data: []
+							},
 						]
 					};
 
@@ -175,13 +182,31 @@
 						return Math.round(int * 1000) / 1000;
 					}
 
+					var total = 0;
+					var dataPoints = 0;
+					var startTimestamp = 0;
+					var endTimestamp = 0;
+
 					for (var i = 0; i < data.length; i++) {
 						var timestamp = data[i].timestamp * 1000;
 						lineChartData.labels.push(timestamp);
 						lineChartData.datasets[0].data.push({ x: timestamp, y: data[i].average });
 						lineChartData.datasets[1].data.push({ x: timestamp, y: data[i].max });
 						lineChartData.datasets[2].data.push({ x: timestamp, y: data[i].min });
+						total += data[i].average;
+						dataPoints++;
+
+						if (i === 0) {
+							startTimestamp = timestamp;
+						}
+
+						if (i === data.length - 1) {
+							endTimestamp = timestamp;
+						}
 					}
+
+					lineChartData.datasets[3].data.push({ x: startTimestamp, y: round(total/dataPoints) });
+					lineChartData.datasets[3].data.push({ x: endTimestamp, y: round(total/dataPoints) });
 
 					ctx = document.getElementById("Chart1").getContext("2d");
 					var pingLineChart = new Chart(ctx, {
