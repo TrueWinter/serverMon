@@ -26,7 +26,7 @@ Example:
 }
 ```
 
-Configuring the notifications object in the config file will allow you to receive uptime/downtime notifications. Pushover and Discord webhooks are supported.
+Configuring the notifications object in the config file will allow you to receive uptime/downtime notifications. Pushover, Discord webhooks and Telegram are supported.
 
 It is recommended to use a proxy such as Nginx to proxy port 80 and 443 to ServerMon's port (18514).
 

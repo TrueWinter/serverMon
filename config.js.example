@@ -25,6 +25,10 @@ var config = {
 			user: '',
 			token: '',
 			priority: 0
+		},
+		telegram: {
+			chatId: '',
+			token: ''
 		}
 	},
 	customLogic: {

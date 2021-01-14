@@ -5,9 +5,17 @@ var path = require('path');
 var fs = require('fs');
 var Push = require('pushover-notifications');
 var Webhook = require('discord-webhook-node').Webhook;
+const Slimbot = require('slimbot');
 
 var db = require('./db.js');
 var config = require('./config.js');
+
+var slimbot;
+
+if (config.notifications.telegram.chatId && config.notifications.telegram.token) {
+	slimbot = new Slimbot(config.notifications.telegram.token);
+	slimbot.startPolling();
+}
 
 var app = express();
 var hook = new Webhook(config.notifications.discord);
@@ -48,6 +56,10 @@ function notify(monitor, event) {
 
 	if (config.notifications.discord && config.monitors[monitor].notify.includes('discord')) {
 		hook.send(`New event from ServerMon: ${monitor} is ${event}`);
+	}
+
+	if (config.notifications.telegram.chatId && config.notifications.telegram.token && config.monitors[monitor].notify.includes('telegram')) {
+		slimbot.sendMessage(config.notifications.telegram.chatId, `New event from ServerMon: ${monitor} is ${event}`);
 	}
 }
 
