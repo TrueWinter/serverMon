@@ -1,11 +1,12 @@
-var pingModule = require('ping');
-var express = require('express');
-var cron = require('node-cron');
-var path = require('path');
-var fs = require('fs');
-var Push = require('pushover-notifications');
-var Webhook = require('discord-webhook-node').Webhook;
+const pingModule = require('ping');
+const express = require('express');
+const cron = require('node-cron');
+const path = require('path');
+const fs = require('fs');
+const Push = require('pushover-notifications');
+const Webhook = require('discord-webhook-node').Webhook;
 const Slimbot = require('slimbot');
+const { EventEmitter } = require('events');
 
 var db = require('./db.js');
 var config = require('./config.js');
@@ -30,6 +31,35 @@ if (config.customLogic.auth) {
 		require(`./${config.customLogic.auth}`)(app);
 	} else {
 		console.error(`Custom logic file for auth does not exist at ${path.join(__dirname, config.customLogic.auth)}`);
+	}
+}
+
+var notificationEmitter;
+var notificationEmitterConfig;
+
+if (config.customLogic.notifications) {
+	if (fs.existsSync(path.join(__dirname, config.customLogic.notifications))) {
+		notificationEmitter = new EventEmitter();
+		var notificationLogic = require(`./${config.customLogic.notifications}`);
+
+		if (!(typeof notificationLogic.notifications === 'function' && typeof notificationLogic.notificationsConfig === 'object' && Array.isArray(notificationLogic.notificationsConfig.subscribedEvents))) {
+			console.error(`
+Error in custom logic file for notifications. \`notifications\` must be a function. \`notificationsConfig\` must be an object containing the \`subscribedEvents\` array
+
+You currently have:
+\`notifications\`: ${typeof notificationLogic.notifications} (${typeof notificationLogic.notifications === 'function' ? 'correct' : 'incorrect'})
+\`notificationsConfig\`: ${typeof notificationLogic.notificationsConfig} (${typeof notificationLogic.notificationsConfig === 'object' ? 'correct' : 'incorrect'})
+\`notificationsConfig.subscribedEvents\` ${Array.isArray(notificationLogic.notificationsConfig.subscribedEvents) ? 'array' : typeof notificationLogic.notificationsConfig.subscribedEvents} (${Array.isArray(notificationLogic.notificationsConfig.subscribedEvents) ? 'correct' : 'incorrect'})
+
+Custom logic for notifications has been disabled.
+			`);
+			return config.customLogic.notifications = null;
+		}
+
+		notificationLogic.notifications(notificationEmitter);
+		notificationEmitterConfig = notificationLogic.notificationsConfig;
+	} else {
+		console.error(`Custom logic file for notifications does not exist at ${path.join(__dirname, config.customLogic.notifications)}`);
 	}
 }
 
@@ -63,16 +93,35 @@ function notify(monitor, event) {
 	}
 }
 
+function emitSubscribedEvents(monitor, data, eventName) {
+	if (!config.customLogic.notifications) {
+		return;
+	}
+
+	if (!notificationEmitterConfig.subscribedEvents.includes(eventName)) {
+		return;
+	}
+
+	if (!config.monitors[monitor].notify.includes('custom')) {
+		return;
+	}
+
+	notificationEmitter.emit(eventName, data);
+}
+
 // Ping
 
 function ping(monitor, host, cb) {
 	pingModule.promise.probe(host, { attempts: 5, min_reply: 5 }).then(function(data) {
-		console.log(data);
-
 		if (!data.alive) {
 			db.insertPingResults(null, null, null, monitor);
 			if (config.monitors[monitor].up) {
 				notify(monitor, 'down');
+				var emitData = {
+					monitor,
+					status: 'down'
+				};
+				emitSubscribedEvents(monitor, emitData, 'down');
 			}
 
 			config.monitors[monitor].up = false;
@@ -81,10 +130,24 @@ function ping(monitor, host, cb) {
 
 		if (!config.monitors[monitor].up) {
 			notify(monitor, 'up');
+			// eslint-disable-next-line no-redeclare
+			var emitData = {
+				monitor,
+				status: 'up'
+			};
+			emitSubscribedEvents(monitor, emitData, 'up');
 		}
 		config.monitors[monitor].up = true;
 
 		db.insertPingResults(round(data.avg), round(data.max), round(data.min), monitor);
+		// eslint-disable-next-line no-redeclare
+		var emitData = {
+			monitor,
+			min: data.min,
+			avg: data.avg,
+			max: data.max
+		};
+		emitSubscribedEvents(monitor, emitData, 'ping');
 		return cb(null, `Monitor: ${monitor} | Minimum: ${data.min} | Maximum: ${data.max} | Average: ${data.avg}`);
 	});
 }

@@ -16,7 +16,7 @@ var config = {
 			name: 'UK Dev Loadbalancer 01',
 			ip: '198.51.100.95',
 			cron: '*/5 * * * *',
-			notify: ['discord']
+			notify: ['discord', 'custom']
 		}
 	},
 	notifications: {
@@ -32,7 +32,8 @@ var config = {
 		}
 	},
 	customLogic: {
-		auth: ''
+		auth: '',
+		notifications: ''
 	} 
 };
 

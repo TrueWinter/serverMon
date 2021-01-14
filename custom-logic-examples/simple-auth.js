@@ -1,9 +1,9 @@
 /*
-This is a simple example to enable auth on ServerMon.
-As the custom logic allows you to write any code you want,
-you can implement more advanced auth systems or use an SSO provider.
+	This is a simple example to enable auth on ServerMon.
+	As the custom logic allows you to write any code you want,
+	you can implement more advanced auth systems or use an SSO provider.
 
-To use this logic code, set customLogic.auth in the config file to'custom-logic-examples/simple-auth.js'.
+	To use this logic code, set `customLogic.auth` in the config file to 'custom-logic-examples/simple-auth.js'.
 */
 
 var bodyParser = require('body-parser');
