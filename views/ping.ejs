@@ -182,10 +182,10 @@
 						return Math.round(int * 1000) / 1000;
 					}
 
-					console.log(`DATA: ${data.length}`);
+					//console.log(`DATA: ${data.length}`);
 
 					var total = 0;
-					var dataPoints = data.length;
+					var dataPoints = 0;
 					var startTimestamp = 0;
 					var endTimestamp = 0;
 
@@ -198,6 +198,7 @@
 						
 						if (data[i].average) {
 							total += data[i].average;
+							dataPoints++;
 						}
 
 						if (i === 0) {
@@ -209,8 +210,8 @@
 						}
 					}
 
-					console.log(total);
-					console.log(dataPoints);
+					//console.log(total);
+					//console.log(dataPoints);
 
 					lineChartData.datasets[3].data.push({ x: startTimestamp, y: round(total/dataPoints) });
 					lineChartData.datasets[3].data.push({ x: endTimestamp, y: round(total/dataPoints) });
