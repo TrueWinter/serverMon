@@ -504,10 +504,10 @@
 
 						console.log(`CM: ${currentMax}`);
 
-						pingLineChart.options.scales.yAxes[0].ticks.max = undefined;
-
 						setTimeout(function() {
 							//console.log(pingLineChart.scales['y-axis-0']._ticks);
+
+							pingLineChart.options.scales.yAxes[0].ticks.max = undefined;
 						
 							if (pingLineChart.scales['y-axis-0']._ticks[1].value + (step * minPadding) < currentMax) {
 								console.log(`Adding ${step}`);
