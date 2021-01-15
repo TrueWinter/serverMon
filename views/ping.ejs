@@ -249,6 +249,8 @@
 						var paddingToAdd = 1.15; // 15%
 						var roundToNearest = 5;
 
+						window.data = data;
+
 						for (var i = 0; i < data.length; i++) {
 							//console.log(data[i]);
 							if (data[i][dataset] !== null && (i === 0 || data[i][dataset] > currentMax)) {
