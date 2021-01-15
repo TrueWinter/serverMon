@@ -373,6 +373,8 @@
 						}
 					});
 
+					window.lc = pingLineChart;
+
 					function showAlert() {
 						if (alertAbovePercent) {
 							var times = lineChartData.datasets[1].data;
@@ -481,8 +483,6 @@
 					}
 
 					window.recalc = recalculateMaxTicks;
-
-					window.lc = pingLineChart;
 				};
 				xhr.onerror = function() {
 					alert('An error occurred while loading ping data');
