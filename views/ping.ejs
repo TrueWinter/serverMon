@@ -439,14 +439,14 @@
 							return;
 						}
 
-						if (!(pingLineChart.scales['y-axis-0']._ticks && pingLineChart.scales['y-axis-0']._ticks.length >= 2)) {
+						if (!(pingLineChart.scales['y-axis-0']._ticks && pingLineChart.scales['y-axis-0']._ticks.length >= 3)) {
 							setTimeout(function() {
 								recalculateMaxTicks();
 							}, 50);
 							return;
 						}
 
-						if (pingLineChart.scales['y-axis-0']._ticks.length >= 2 && (pingLineChart.scales['y-axis-0']._ticks[0].value - pingLineChart.scales['y-axis-0']._ticks[1].value) === (pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value)) {
+						if (pingLineChart.scales['y-axis-0']._ticks.length >= 3 && (pingLineChart.scales['y-axis-0']._ticks[0].value - pingLineChart.scales['y-axis-0']._ticks[1].value) === (pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value)) {
 							return;
 						}
 
