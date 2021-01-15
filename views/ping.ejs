@@ -140,6 +140,8 @@
 				xhr.onload = function() {
 					var data = JSON.parse(this.responseText).data;
 
+					window.data = data;
+
 					document.getElementById('chartArea').style.filter = '';
 					document.getElementById('chartArea').style.pointerEvents = '';
 
@@ -259,7 +261,7 @@
 						var paddingToAdd = 1.10;
 						var roundToNearest = 5;
 
-						window.data = data;
+						//window.data = data;
 
 						for (var i = 0; i < data.length; i++) {
 							//console.log(data[i]);
@@ -460,9 +462,14 @@
 							return;
 						}
 
-						if (pingLineChart.scales['y-axis-0']._ticks.length >= 3 && (pingLineChart.scales['y-axis-0']._ticks[0].value - pingLineChart.scales['y-axis-0']._ticks[1].value) === (pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value)) {
+						if (pingLineChart.scales['y-axis-0']._ticks.length < 3) {
+						//&& (pingLineChart.scales['y-axis-0']._ticks[0].value - pingLineChart.scales['y-axis-0']._ticks[1].value) === (pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value)) {
 							return;
 						}
+
+						var step = pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value;
+
+						console.log(`STEP: ${step}`);
 
 						var dataset;
 
@@ -477,7 +484,8 @@
 						}
 
 						var currentMax = 0;
-						var paddingToAdd = 1.10;
+						//var paddingToAdd = 1.10;
+						var minPadding = 0.7;
 						var roundToNearest = 5;
 
 						for (var i = 0; i < data.length; i++) {
@@ -488,10 +496,16 @@
 							}
 						}
 
-						//console.log(currentMax);
+						console.log(`CM: ${currentMax}`);
 
 						if (pingLineChart.scales['y-axis-0']._ticks[1].value >= (currentMax + Math.round(currentMax*0.05))) {
 							pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[1].value;
+							pingLineChart.update();
+						}
+
+						if (pingLineChart.scales['y-axis-0']._ticks[1].value + (step * minPadding) < currentMax) {
+							console.log(`Adding ${step}`);
+							pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[0].value + step;
 							pingLineChart.update();
 						}
 					}
