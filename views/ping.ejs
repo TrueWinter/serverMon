@@ -34,6 +34,16 @@
 				text-align: center;
 				display: block;
 			}
+			body {
+				background-color: #222;
+				color: white;
+			}
+			a {
+				color: lime;
+			}
+			a:hover, a:focus {
+				color:rgb(0, 255, 106);
+			}
 		</style>
 	</head>
 	<body>
@@ -316,6 +326,9 @@
 								}
 							},
 							legend: {
+								labels: {
+									fontColor: 'white'
+								},
 								onClick: function(e, legendItem) {
 									var index = legendItem.datasetIndex;
 									var ci = this.chart;
@@ -359,15 +372,21 @@
 									},
 									scaleLabel: {
 										display: true,
-										labelString: 'Time'
+										labelString: 'Time',
+										fontColor: 'white'
+									},
+									ticks: {
+										fontColor: 'white'
 									}
 								}],
 								yAxes: [{
 									scaleLabel: {
 										display: true,
-										labelString: 'Response Time'
+										labelString: 'Response Time',
+										fontColor: 'white'
 									},
 									ticks: {
+										fontColor: 'white'
 										//max: getMaxTicks()
 									}
 								}]
