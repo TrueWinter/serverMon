@@ -217,7 +217,7 @@
 					lineChartData.datasets[0].data.push({ x: startTimestamp, y: round(total/dataPoints) });
 					lineChartData.datasets[0].data.push({ x: endTimestamp, y: round(total/dataPoints) });
 
-					var alertAbovePercent = <%= alertAbovePercent %>;
+					var alertAbovePercent = <%= alertAbovePercent || false %>;
 
 					//console.log(alertAbovePercent);
 					//console.log(1 + (alertAbovePercent / 100));
