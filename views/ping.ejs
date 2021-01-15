@@ -469,7 +469,7 @@
 
 						var step = pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value;
 
-						console.log(`STEP: ${step}`);
+						//console.log(`STEP: ${step}`);
 
 						var dataset;
 
@@ -496,7 +496,7 @@
 							}
 						}
 
-						console.log(`CM: ${currentMax}`);
+						//console.log(`CM: ${currentMax}`);
 
 						if (pingLineChart.scales['y-axis-0']._ticks[1].value >= (currentMax + Math.round(currentMax*0.05))) {
 							pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[1].value;
