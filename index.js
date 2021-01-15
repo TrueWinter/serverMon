@@ -181,7 +181,7 @@ app.get('/ping/:monitor', function(req, res) {
 		return res.end('Invalid monitor');
 	}
 
-	res.render('ping', { id: req.params.monitor, name: config.monitors[req.params.monitor].name });
+	res.render('ping', { id: req.params.monitor, name: config.monitors[req.params.monitor].name, alertAbovePercent: config.monitors[req.params.monitor].alertAbovePercent || null });
 });
 
 app.get('/monitors', function(req, res) {

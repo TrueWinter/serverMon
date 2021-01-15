@@ -141,6 +141,14 @@
 						labels: [],
 						datasets: [
 							{
+								label: 'Time Period Average',
+								borderColor: 'pink',
+								backgroundColor: 'transparent',
+								spanGaps: false,
+								borderWidth: 1,
+								data: []
+							},
+							{
 								label: 'Average',
 								borderColor: 'cyan',
 								backgroundColor: 'transparent',
@@ -160,14 +168,7 @@
 								backgroundColor: 'transparent',
 								spanGaps: false,
 								data: []
-							},
-							{
-								label: 'Time Period Average',
-								borderColor: 'pink',
-								backgroundColor: 'transparent',
-								spanGaps: false,
-								data: []
-							},
+							}
 						]
 					};
 
@@ -192,9 +193,9 @@
 					for (var i = 0; i < data.length; i++) {
 						var timestamp = data[i].timestamp * 1000;
 						lineChartData.labels.push(timestamp);
-						lineChartData.datasets[0].data.push({ x: timestamp, y: data[i].average });
-						lineChartData.datasets[1].data.push({ x: timestamp, y: data[i].max });
-						lineChartData.datasets[2].data.push({ x: timestamp, y: data[i].min });
+						lineChartData.datasets[1].data.push({ x: timestamp, y: data[i].average });
+						lineChartData.datasets[2].data.push({ x: timestamp, y: data[i].max });
+						lineChartData.datasets[3].data.push({ x: timestamp, y: data[i].min });
 						
 						if (data[i].average) {
 							total += data[i].average;
@@ -213,8 +214,67 @@
 					//console.log(total);
 					//console.log(dataPoints);
 
-					lineChartData.datasets[3].data.push({ x: startTimestamp, y: round(total/dataPoints) });
-					lineChartData.datasets[3].data.push({ x: endTimestamp, y: round(total/dataPoints) });
+					lineChartData.datasets[0].data.push({ x: startTimestamp, y: round(total/dataPoints) });
+					lineChartData.datasets[0].data.push({ x: endTimestamp, y: round(total/dataPoints) });
+
+					var alertAbovePercent = <%= alertAbovePercent %>;
+
+					//console.log(alertAbovePercent);
+					//console.log(1 + (alertAbovePercent / 100));
+
+					var maxShown = true;
+					var averageShown = true;
+					var minShown = true;
+
+					function getMaxTicks() {
+						var dataset;
+
+						/*console.log(`MAX: ${maxShown}`);
+						console.log(`AVERAGE: ${averageShown}`);
+						console.log(`MIN: ${minShown}`);*/
+
+						if (maxShown) {
+							dataset = 'max';
+						} else if (averageShown) {
+							dataset = 'average';
+						} else if (minShown) {
+							dataset = 'min';
+						} else {
+							return;
+						}
+
+						//console.log(dataset);
+
+						var currentMax;
+						var paddingToAdd = 1.15; // 15%
+						var roundToNearest = 5;
+
+						for (var i = 0; i < data.length; i++) {
+							//console.log(data[i]);
+							if (data[i][dataset] !== null && (i === 0 || data[i][dataset] > currentMax)) {
+								currentMax = data[i][dataset];
+								//console.log(currentMax);
+							}
+						}
+						
+						var tempMaxValue = Math.round(currentMax * paddingToAdd);
+						var returnedMaxValue = tempMaxValue;
+
+						if (tempMaxValue % roundToNearest !== 0) {
+							returnedMaxValue = Math.ceil(tempMaxValue / roundToNearest) * roundToNearest;
+						}
+
+						if (currentMax === 0) {
+							returnedMaxValue = roundToNearest;
+						}
+
+						//console.log(returnedMaxValue);
+						//return tempMaxValue;
+
+						return returnedMaxValue;
+					}
+
+					window.getMaxTicks = getMaxTicks;
 
 					ctx = document.getElementById("Chart1").getContext("2d");
 					var pingLineChart = new Chart(ctx, {
@@ -223,9 +283,59 @@
 						options: {
 							animation: false,
 							maintainAspectRatio: false,
+							hover: {
+								mode: 'point'
+							},
 							tooltips: {
 								mode: 'index',
-								axis: 'y'
+								axis: 'y',
+								// https://stackoverflow.com/a/48151428
+								filter: function (tooltipItem, data) {
+									var label = data.datasets[tooltipItem.datasetIndex].label;
+									//console.log(tooltipItem);
+									//console.log(data);
+									if (label === `${alertAbovePercent}% above average`) {
+										return false;
+									} else {
+										return true;
+									}
+								}
+							},
+							legend: {
+								onClick: function(e, legendItem) {
+									var index = legendItem.datasetIndex;
+									var ci = this.chart;
+									var meta = ci.getDatasetMeta(index);
+
+									// See controller.isDatasetVisible comment
+									meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+
+									var isHidden = meta.hidden;
+									var legendItemName = legendItem.text;
+
+									switch(legendItemName) {
+										case 'Max':
+											maxShown = !isHidden;
+											break;
+										case 'Min':
+											minShown = !isHidden;
+											break;
+										case 'Average':
+											averageShown = !isHidden;
+											break;
+									}
+
+									ci.options.scales.yAxes[0].ticks.max = getMaxTicks();
+									//ci.update();
+
+									if (['Max', 'Min', 'Average'].includes(legendItemName)) {
+										ci.data.datasets.pop();
+										ci.update();
+										showAlert();
+									} else {
+										ci.update();
+									}
+								}
 							},
 							scales: {
 								xAxes: [{
@@ -242,11 +352,77 @@
 									scaleLabel: {
 										display: true,
 										labelString: 'Response Time'
+									},
+									/*beforeFit: function(axis) {
+										console.log(axis);
+										return this.height + 100;
+									}*/
+									ticks: {
+										max: getMaxTicks()
 									}
 								}]
 							}
 						}
 					});
+
+					function showAlert() {
+						if (alertAbovePercent) {
+							var times = lineChartData.datasets[1].data;
+
+							var alertTimes = [];
+							var alertDataset = [];
+							var alertAbove = round(total/dataPoints) * (1 + (alertAbovePercent / 100));
+
+							console.log(alertAbove);
+
+							console.log(`T: ${times.length}`);
+
+							for (var i = 0; i < times.length; i++) {
+								//console.log(avg*alertPercentage);
+								console.log(times[i].y);
+								if (times[i].y > alertAbove) {
+									if (i > 0) {
+										alertTimes.push(times[i - 1]);
+									}
+									alertTimes.push(times[i]);
+								}
+							}
+
+							//console.log(alertTimes);
+
+							for (var i = 0; i < times.length; i++) {
+								if (!alertTimes.includes(times[i])) {
+									var tmpData = Object.assign({}, times[i]);
+									tmpData.y = pingLineChart.scales['y-axis-0']._startValue;
+									alertDataset.push(tmpData);
+								} else {
+									var tmpData = Object.assign({}, times[i]);
+									tmpData.y = pingLineChart.scales['y-axis-0']._endValue;
+									alertDataset.push(tmpData);
+								}
+							}
+
+							//console.log(alertDataset);
+
+							var alertDatasetConfig = {
+								label: `${alertAbovePercent}% above average`,
+								borderColor: 'transparent',
+								backgroundColor: 'rgba(244, 32, 114, 0.15)',
+								pointRadius: 0,
+								pointHitRadius: 0,
+								pointBorderWidth: 0,
+								steppedLine: true,
+								data: alertDataset
+							};
+								
+							pingLineChart.data.datasets.push(alertDatasetConfig);
+							pingLineChart.update();
+						}
+					}
+
+					showAlert();
+
+					window.sa = showAlert;
 
 					window.lc = pingLineChart;
 				};
