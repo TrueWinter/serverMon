@@ -276,6 +276,18 @@
 
 					window.getMaxTicks = getMaxTicks;
 
+					var plugin = {
+						id: 'recalculateMaxTicks',
+						afterRender: function(chart, options) {
+							recalculateMaxTicks();
+						},
+						afterUpdate: function(chart, options) {
+							recalculateMaxTicks();
+						}
+					};
+
+					Chart.plugins.register(plugin);
+
 					ctx = document.getElementById("Chart1").getContext("2d");
 					var pingLineChart = new Chart(ctx, {
 						type: 'line',
@@ -353,10 +365,6 @@
 										display: true,
 										labelString: 'Response Time'
 									},
-									/*beforeFit: function(axis) {
-										console.log(axis);
-										return this.height + 100;
-									}*/
 									ticks: {
 										max: getMaxTicks()
 									}
@@ -373,9 +381,8 @@
 							var alertDataset = [];
 							var alertAbove = round(total/dataPoints) * (1 + (alertAbovePercent / 100));
 
-							console.log(alertAbove);
-
-							console.log(`T: ${times.length}`);
+							//console.log(alertAbove);
+							//console.log(`T: ${times.length}`);
 
 							for (var i = 0; i < times.length; i++) {
 								//console.log(avg*alertPercentage);
@@ -422,7 +429,51 @@
 
 					showAlert();
 
-					window.sa = showAlert;
+					function recalculateMaxTicks() {
+						if (!pingLineChart) {
+							setTimeout(function() {
+								recalculateMaxTicks();
+							}, 50);
+							return;
+						}
+
+						if (pingLineChart.scales['y-axis-0']._ticks.length >= 2 && (pingLineChart.scales['y-axis-0']._ticks[0].value - pingLineChart.scales['y-axis-0']._ticks[1].value) === (pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value)) {
+							return;
+						}
+
+						var dataset;
+
+						if (maxShown) {
+							dataset = 'max';
+						} else if (averageShown) {
+							dataset = 'average';
+						} else if (minShown) {
+							dataset = 'min';
+						} else {
+							return;
+						}
+
+						var currentMax;
+						var paddingToAdd = 1.15; // 15%
+						var roundToNearest = 5;
+
+						for (var i = 0; i < data.length; i++) {
+							//console.log(data[i]);
+							if (data[i][dataset] !== null && (i === 0 || data[i][dataset] > currentMax)) {
+								currentMax = data[i][dataset];
+								//console.log(currentMax);
+							}
+						}
+
+						//console.log(currentMax);
+
+						if (pingLineChart.scales['y-axis-0']._ticks[1].value >= (currentMax + Math.round(currentMax*0.1))) {
+							pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[1].value;
+							pingLineChart.update();
+						}
+					}
+
+					window.recalc = recalculateMaxTicks;
 
 					window.lc = pingLineChart;
 				};
