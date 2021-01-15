@@ -239,6 +239,7 @@
 					var minShown = true;
 
 					function getMaxTicks() {
+						alert('why is this running');
 						var dataset;
 
 						/*console.log(`MAX: ${maxShown}`);
@@ -292,9 +293,6 @@
 
 					var plugin = {
 						id: 'recalculateMaxTicks',
-						afterRender: function(chart, options) {
-							recalculateMaxTicks();
-						},
 						afterUpdate: function(chart, options) {
 							recalculateMaxTicks();
 						}
@@ -354,11 +352,14 @@
 											break;
 									}
 
-									ci.options.scales.yAxes[0].ticks.max = getMaxTicks();
+									//ci.options.scales.yAxes[0].ticks.max = getMaxTicks();
+									//recalculateMaxTicks();
 									//ci.update();
 
 									if (['Max', 'Min', 'Average'].includes(legendItemName)) {
+										console.log(ci.data.datasets);
 										ci.data.datasets.pop();
+										console.log(ci.data.datasets);
 										ci.update();
 										showAlert();
 									} else {
@@ -429,6 +430,7 @@
 									alertDataset.push(tmpData);
 								} else {
 									var tmpData = Object.assign({}, times[i]);
+									console.log(`Y: ${pingLineChart.scales['y-axis-0']._endValue}`);
 									tmpData.y = pingLineChart.scales['y-axis-0']._endValue;
 									alertDataset.push(tmpData);
 								}
@@ -457,7 +459,7 @@
 					function recalculateMaxTicks() {
 						if (!pingLineChart) {
 							setTimeout(function() {
-								recalculateMaxTicks();
+								//recalculateMaxTicks();
 							}, 50);
 							return;
 						}
@@ -470,6 +472,10 @@
 						var step = pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value;
 
 						//console.log(`STEP: ${step}`);
+
+						console.log(`MAX: ${maxShown}`);
+						console.log(`AVERAGE: ${averageShown}`);
+						console.log(`MIN: ${minShown}`);
 
 						var dataset;
 
@@ -496,18 +502,22 @@
 							}
 						}
 
-						//console.log(`CM: ${currentMax}`);
+						console.log(`CM: ${currentMax}`);
 
-						if (pingLineChart.scales['y-axis-0']._ticks[1].value >= (currentMax + Math.round(currentMax*0.05))) {
-							pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[1].value;
-							pingLineChart.update();
-						}
+						pingLineChart.options.scales.yAxes[0].ticks.max = undefined;
 
-						if (pingLineChart.scales['y-axis-0']._ticks[1].value + (step * minPadding) < currentMax) {
-							console.log(`Adding ${step}`);
-							pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[0].value + step;
-							pingLineChart.update();
-						}
+						setTimeout(function() {
+							//console.log(pingLineChart.scales['y-axis-0']._ticks);
+						
+							if (pingLineChart.scales['y-axis-0']._ticks[1].value + (step * minPadding) < currentMax) {
+								console.log(`Adding ${step}`);
+								pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[0].value + step;
+								//pingLineChart.update();
+								pingLineChart.data.datasets.pop();
+								pingLineChart.update();
+								showAlert();
+							}
+						}, 50); // Chart.js returns multiple step values, the delay here should be enough to get the final value
 					}
 
 					window.recalc = recalculateMaxTicks;
