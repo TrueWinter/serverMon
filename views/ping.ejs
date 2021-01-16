@@ -357,9 +357,7 @@
 									//ci.update();
 
 									if (['Max', 'Min', 'Average'].includes(legendItemName)) {
-										console.log(ci.data.datasets);
 										ci.data.datasets.pop();
-										console.log(ci.data.datasets);
 										ci.update();
 										showAlert();
 									} else {
@@ -473,9 +471,9 @@
 
 						//console.log(`STEP: ${step}`);
 
-						console.log(`MAX: ${maxShown}`);
-						console.log(`AVERAGE: ${averageShown}`);
-						console.log(`MIN: ${minShown}`);
+						//console.log(`MAX: ${maxShown}`);
+						//console.log(`AVERAGE: ${averageShown}`);
+						//console.log(`MIN: ${minShown}`);
 
 						var dataset;
 
@@ -502,7 +500,7 @@
 							}
 						}
 
-						console.log(`CM: ${currentMax}`);
+						//console.log(`CM: ${currentMax}`);
 
 						setTimeout(function() {
 							//console.log(pingLineChart.scales['y-axis-0']._ticks);
@@ -510,7 +508,7 @@
 							pingLineChart.options.scales.yAxes[0].ticks.max = undefined;
 						
 							if (pingLineChart.scales['y-axis-0']._ticks[1].value + (step * minPadding) < currentMax) {
-								console.log(`Adding ${step}`);
+								//console.log(`Adding ${step}`);
 								pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[0].value + step;
 								//pingLineChart.update();
 								pingLineChart.data.datasets.pop();
