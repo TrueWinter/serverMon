@@ -291,6 +291,8 @@
 
 					window.getMaxTicks = getMaxTicks;
 
+					var disableRedoAlertRender = false;
+
 					var plugin = {
 						id: 'recalculateMaxTicks',
 						afterUpdate: function(chart, options) {
@@ -357,10 +359,15 @@
 									//ci.update();
 
 									if (['Max', 'Min', 'Average'].includes(legendItemName)) {
+										disableRedoAlertRender = false;
 										ci.data.datasets.pop();
 										ci.update();
 										showAlert();
 									} else {
+										if (legendItemName === `${alertAbovePercent}% above average`) {
+											disableRedoAlertRender = true;
+										}
+										
 										ci.update();
 									}
 								}
@@ -511,9 +518,13 @@
 								//console.log(`Adding ${step}`);
 								pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[0].value + step;
 								//pingLineChart.update();
-								pingLineChart.data.datasets.pop();
-								pingLineChart.update();
-								showAlert();
+								if (!disableRedoAlertRender) {
+									pingLineChart.data.datasets.pop();
+									pingLineChart.update();
+									showAlert();
+								} else {
+									pingLineChart.update();
+								}
 							}
 						}, 50); // Chart.js returns multiple step values, the delay here should be enough to get the final value
 					}
