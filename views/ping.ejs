@@ -195,8 +195,6 @@
 						return Math.round(int * 1000) / 1000;
 					}
 
-					//console.log(`DATA: ${data.length}`);
-
 					var total = 0;
 					var dataPoints = 0;
 					var startTimestamp = 0;
@@ -223,28 +221,27 @@
 						}
 					}
 
-					//console.log(total);
-					//console.log(dataPoints);
-
 					lineChartData.datasets[0].data.push({ x: startTimestamp, y: round(total/dataPoints) });
 					lineChartData.datasets[0].data.push({ x: endTimestamp, y: round(total/dataPoints) });
 
 					var alertAbovePercent = <%= alertAbovePercent || false %>;
 
-					//console.log(alertAbovePercent);
-					//console.log(1 + (alertAbovePercent / 100));
-
 					var maxShown = true;
 					var averageShown = true;
 					var minShown = true;
 
-					function getMaxTicks() {
-						alert('why is this running');
-						var dataset;
+					var disableRedoAlertRender = false;
 
-						/*console.log(`MAX: ${maxShown}`);
-						console.log(`AVERAGE: ${averageShown}`);
-						console.log(`MIN: ${minShown}`);*/
+					var step = 0;
+
+					function doAddTick(ticks) {
+						if (ticks.length < 3) {
+							return false;
+						}
+
+						step = ticks[1] - ticks[2];
+
+						var dataset;
 
 						if (maxShown) {
 							dataset = 'max';
@@ -256,51 +253,23 @@
 							return;
 						}
 
-						//console.log(dataset);
-
 						var currentMax = 0;
-						var paddingToAdd = 1.10;
+						var minPadding = 0.7;
 						var roundToNearest = 5;
 
-						//window.data = data;
-
 						for (var i = 0; i < data.length; i++) {
-							//console.log(data[i]);
 							if (data[i][dataset] !== null && (i === 0 || data[i][dataset] > currentMax)) {
 								currentMax = data[i][dataset];
-								//console.log(currentMax);
 							}
 						}
-						
-						var tempMaxValue = Math.round(currentMax * paddingToAdd);
-						var returnedMaxValue = tempMaxValue;
-
-						if (tempMaxValue % roundToNearest !== 0) {
-							returnedMaxValue = Math.ceil(tempMaxValue / roundToNearest) * roundToNearest;
+					
+						if (ticks[1] + (step * minPadding) < currentMax) {
+							console.log(`Adding ${step} to ticks`);
+							return true;
+						} else {
+							return false;
 						}
-
-						if (currentMax === 0) {
-							returnedMaxValue = roundToNearest;
-						}
-
-						//console.log(returnedMaxValue);
-						//return tempMaxValue;
-
-						return returnedMaxValue;
 					}
-
-					window.getMaxTicks = getMaxTicks;
-
-					var disableRedoAlertRender = false;
-
-					var plugin = {
-						id: 'recalculateMaxTicks',
-						afterUpdate: function(chart, options) {
-							recalculateMaxTicks();
-						}
-					};
-
-					Chart.plugins.register(plugin);
 
 					ctx = document.getElementById("Chart1").getContext("2d");
 					var pingLineChart = new Chart(ctx, {
@@ -318,8 +287,6 @@
 								// https://stackoverflow.com/a/48151428
 								filter: function (tooltipItem, data) {
 									var label = data.datasets[tooltipItem.datasetIndex].label;
-									//console.log(tooltipItem);
-									//console.log(data);
 									if (label === `${alertAbovePercent}% above average`) {
 										return false;
 									} else {
@@ -354,15 +321,13 @@
 											break;
 									}
 
-									//ci.options.scales.yAxes[0].ticks.max = getMaxTicks();
-									//recalculateMaxTicks();
-									//ci.update();
+									var hiddenAlert = ci.data.datasets[4]._meta[0].hidden || false;
 
 									if (['Max', 'Min', 'Average'].includes(legendItemName)) {
 										disableRedoAlertRender = false;
 										ci.data.datasets.pop();
 										ci.update();
-										showAlert();
+										showAlert(hiddenAlert);
 									} else {
 										if (legendItemName === `${alertAbovePercent}% above average`) {
 											disableRedoAlertRender = true;
@@ -393,9 +358,20 @@
 										labelString: 'Response Time',
 										fontColor: 'white'
 									},
+									afterBuildTicks: function(axis, ticks) {
+										var addTick = doAddTick(ticks);
+
+										if (addTick) {
+											var newTick = ticks[0] + step;
+											var newTickArray = [newTick].concat(ticks);
+											axis.max = newTick;
+											return newTickArray;
+										} else {
+											return ticks;
+										}
+									},
 									ticks: {
 										fontColor: 'white'
-										//max: getMaxTicks()
 									}
 								}]
 							}
@@ -404,7 +380,7 @@
 
 					window.lc = pingLineChart;
 
-					function showAlert() {
+					function showAlert(hideAlert) {
 						if (alertAbovePercent) {
 							var times = lineChartData.datasets[1].data;
 
@@ -412,12 +388,7 @@
 							var alertDataset = [];
 							var alertAbove = round(total/dataPoints) * (1 + (alertAbovePercent / 100));
 
-							//console.log(alertAbove);
-							//console.log(`T: ${times.length}`);
-
 							for (var i = 0; i < times.length; i++) {
-								//console.log(avg*alertPercentage);
-								//console.log(times[i].y);
 								if (times[i].y > alertAbove) {
 									if (i > 0) {
 										alertTimes.push(times[i - 1]);
@@ -426,8 +397,6 @@
 								}
 							}
 
-							//console.log(alertTimes);
-
 							for (var i = 0; i < times.length; i++) {
 								if (!alertTimes.includes(times[i])) {
 									var tmpData = Object.assign({}, times[i]);
@@ -435,13 +404,10 @@
 									alertDataset.push(tmpData);
 								} else {
 									var tmpData = Object.assign({}, times[i]);
-									//console.log(`Y: ${pingLineChart.scales['y-axis-0']._endValue}`);
 									tmpData.y = pingLineChart.scales['y-axis-0']._endValue;
 									alertDataset.push(tmpData);
 								}
 							}
-
-							//console.log(alertDataset);
 
 							var alertDatasetConfig = {
 								label: `${alertAbovePercent}% above average`,
@@ -451,85 +417,16 @@
 								pointHitRadius: 0,
 								pointBorderWidth: 0,
 								steppedLine: true,
-								data: alertDataset
+								data: alertDataset,
+								hidden: hideAlert || false
 							};
-								
+
 							pingLineChart.data.datasets.push(alertDatasetConfig);
 							pingLineChart.update();
 						}
 					}
 
 					showAlert();
-
-					function recalculateMaxTicks() {
-						if (!pingLineChart) {
-							setTimeout(function() {
-								//recalculateMaxTicks();
-							}, 50);
-							return;
-						}
-
-						if (pingLineChart.scales['y-axis-0']._ticks.length < 3) {
-						//&& (pingLineChart.scales['y-axis-0']._ticks[0].value - pingLineChart.scales['y-axis-0']._ticks[1].value) === (pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value)) {
-							return;
-						}
-
-						var step = pingLineChart.scales['y-axis-0']._ticks[1].value - pingLineChart.scales['y-axis-0']._ticks[2].value;
-
-						//console.log(`STEP: ${step}`);
-
-						//console.log(`MAX: ${maxShown}`);
-						//console.log(`AVERAGE: ${averageShown}`);
-						//console.log(`MIN: ${minShown}`);
-
-						var dataset;
-
-						if (maxShown) {
-							dataset = 'max';
-						} else if (averageShown) {
-							dataset = 'average';
-						} else if (minShown) {
-							dataset = 'min';
-						} else {
-							return;
-						}
-
-						var currentMax = 0;
-						//var paddingToAdd = 1.10;
-						var minPadding = 0.7;
-						var roundToNearest = 5;
-
-						for (var i = 0; i < data.length; i++) {
-							//console.log(data[i]);
-							if (data[i][dataset] !== null && (i === 0 || data[i][dataset] > currentMax)) {
-								currentMax = data[i][dataset];
-								//console.log(currentMax);
-							}
-						}
-
-						//console.log(`CM: ${currentMax}`);
-
-						setTimeout(function() {
-							//console.log(pingLineChart.scales['y-axis-0']._ticks);
-
-							pingLineChart.options.scales.yAxes[0].ticks.max = undefined;
-						
-							if (pingLineChart.scales['y-axis-0']._ticks[1].value + (step * minPadding) < currentMax) {
-								//console.log(`Adding ${step}`);
-								pingLineChart.options.scales.yAxes[0].ticks.max = pingLineChart.scales['y-axis-0']._ticks[0].value + step;
-								//pingLineChart.update();
-								if (!disableRedoAlertRender) {
-									pingLineChart.data.datasets.pop();
-									pingLineChart.update();
-									showAlert();
-								} else {
-									pingLineChart.update();
-								}
-							}
-						}, 50); // Chart.js returns multiple step values, the delay here should be enough to get the final value
-					}
-
-					window.recalc = recalculateMaxTicks;
 				};
 				xhr.onerror = function() {
 					alert('An error occurred while loading ping data');
