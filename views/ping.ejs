@@ -309,6 +309,7 @@
 
 									// See controller.isDatasetVisible comment
 									meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+									ci.data.datasets[index].hidden = meta.hidden;
 
 									var isHidden = meta.hidden;
 									var legendItemName = legendItem.text;
@@ -325,13 +326,13 @@
 											break;
 									}
 
-									var hiddenAlert = ci.data.datasets[4]._meta[0].hidden || false;
+									var hiddenAlert = ci.getDatasetMeta(4).hidden;
 
 									if (['Max', 'Min', 'Average'].includes(legendItemName)) {
 										disableRedoAlertRender = false;
 										ci.data.datasets.pop();
 										ci.update();
-										showAlert();
+										showAlert(hiddenAlert);
 									} else {
 										if (legendItemName === `${alertAbovePercent}% above average`) {
 											disableRedoAlertRender = true;
@@ -385,7 +386,7 @@
 
 					window.lc = pingLineChart;
 
-					function showAlert() {
+					function showAlert(hideDataset) {
 						if (alertAbovePercent) {
 							var times = lineChartData.datasets[1].data;
 
@@ -422,15 +423,18 @@
 								pointHitRadius: 0,
 								pointBorderWidth: 0,
 								steppedLine: true,
-								data: alertDataset
+								data: alertDataset,
+								hidden: hideDataset
 							};
 
 							pingLineChart.data.datasets.push(alertDatasetConfig);
 							pingLineChart.update();
+
+							pingLineChart.getDatasetMeta(4).hidden = hideDataset;
 						}
 					}
 
-					showAlert();
+					showAlert(null);
 				};
 				xhr.onerror = function() {
 					alert('An error occurred while loading ping data');
