@@ -51,13 +51,17 @@
 			<h1>Ping Data for <b><%= name %></b></h1>
 			<a id="back" href="/monitors">Monitors</a>
 			<hr />
-			Change graph time period:
-			<input type="text" id="timeValue" onkeydown="if (event.keyCode==13){formSubmitted()}" pattern="[0-9]{1,2}" maxlength="2" size="2" autocomplete="off" />
-			<select id="timeUnit" onkeydown="if (event.keyCode==13){formSubmitted()}" autocomplete="off">
-				<option value="hours">hours</option>
-				<option value="days">days</option>
-			</select>
-			<button type="button" id="loadBtn">Load</button>
+			<div class="chart-options">
+				<div class="chart-option">
+					Change graph time period:
+					<input type="text" id="timeValue" onkeydown="if (event.keyCode==13){formSubmitted()}" pattern="[0-9]{1,2}" maxlength="2" size="2" autocomplete="off" />
+					<select id="timeUnit" onkeydown="if (event.keyCode==13){formSubmitted()}" autocomplete="off">
+						<option value="hours">hours</option>
+						<option value="days">days</option>
+					</select>
+					<button type="button" id="loadBtn">Load</button>
+				</div>
+			</div>
 			<hr />
 			<div id="chartArea">
 				<canvas id="Chart1" style="max-height: 550px; display: block; width: 1100px; height: 550px;"></canvas>
@@ -235,6 +239,7 @@
 					var step = 0;
 
 					function doAddTick(ticks) {
+						console.log(ticks);
 						if (ticks.length < 3) {
 							return false;
 						}
@@ -327,7 +332,7 @@
 										disableRedoAlertRender = false;
 										ci.data.datasets.pop();
 										ci.update();
-										showAlert(hiddenAlert);
+										showAlert();
 									} else {
 										if (legendItemName === `${alertAbovePercent}% above average`) {
 											disableRedoAlertRender = true;
@@ -359,12 +364,14 @@
 										fontColor: 'white'
 									},
 									afterBuildTicks: function(axis, ticks) {
+										console.log(axis);
 										var addTick = doAddTick(ticks);
 
 										if (addTick) {
 											var newTick = ticks[0] + step;
 											var newTickArray = [newTick].concat(ticks);
 											axis.max = newTick;
+											axis.options.ticks.maxTicksLimit = 12;
 											return newTickArray;
 										} else {
 											return ticks;
@@ -380,7 +387,7 @@
 
 					window.lc = pingLineChart;
 
-					function showAlert(hideAlert) {
+					function showAlert() {
 						if (alertAbovePercent) {
 							var times = lineChartData.datasets[1].data;
 
@@ -404,6 +411,7 @@
 									alertDataset.push(tmpData);
 								} else {
 									var tmpData = Object.assign({}, times[i]);
+									//console.log(pingLineChart.scales['y-axis-0']);
 									tmpData.y = pingLineChart.scales['y-axis-0']._endValue;
 									alertDataset.push(tmpData);
 								}
@@ -417,8 +425,7 @@
 								pointHitRadius: 0,
 								pointBorderWidth: 0,
 								steppedLine: true,
-								data: alertDataset,
-								hidden: hideAlert || false
+								data: alertDataset
 							};
 
 							pingLineChart.data.datasets.push(alertDatasetConfig);
