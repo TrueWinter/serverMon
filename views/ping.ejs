@@ -239,7 +239,6 @@
 					var step = 0;
 
 					function doAddTick(ticks) {
-						console.log(ticks);
 						if (ticks.length < 3) {
 							return false;
 						}
@@ -364,7 +363,6 @@
 										fontColor: 'white'
 									},
 									afterBuildTicks: function(axis, ticks) {
-										console.log(axis);
 										var addTick = doAddTick(ticks);
 
 										if (addTick) {
@@ -411,7 +409,6 @@
 									alertDataset.push(tmpData);
 								} else {
 									var tmpData = Object.assign({}, times[i]);
-									//console.log(pingLineChart.scales['y-axis-0']);
 									tmpData.y = pingLineChart.scales['y-axis-0']._endValue;
 									alertDataset.push(tmpData);
 								}
