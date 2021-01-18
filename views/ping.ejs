@@ -44,6 +44,10 @@
 			a:hover, a:focus {
 				color:rgb(0, 255, 106);
 			}
+			.chart-options {
+				display: flex;
+				justify-content: space-around;
+			}
 		</style>
 	</head>
 	<body>
@@ -60,6 +64,15 @@
 						<option value="days">days</option>
 					</select>
 					<button type="button" id="loadBtn">Load</button>
+				</div>
+				<div class="chart-option">
+					Above average data:
+					<select id="alertDataOption" onkeydown="if (event.keyCode==13){changeAlertData()}" autocomplete="off">
+						<option value="average" selected>Average</option>
+						<option value="min">Min</option>
+						<option value="max">Max</option>
+					</select>
+					<button type="button" id="loadBtnAlertData">Load</button>
 				</div>
 			</div>
 			<hr />
@@ -228,6 +241,22 @@
 					lineChartData.datasets[0].data.push({ x: startTimestamp, y: round(total/dataPoints) });
 					lineChartData.datasets[0].data.push({ x: endTimestamp, y: round(total/dataPoints) });
 
+					function calculateAverageForDataset(dataset) {
+						var datasetData = lineChartData.datasets[dataset].data;
+
+						var tmpTotal = 0;
+						var tmpDataPoints = 0;
+
+						for (var i = 0; i < datasetData.length; i++) {
+							if (datasetData[i].y) {
+								tmpTotal += datasetData[i].y;
+								tmpDataPoints++;
+							}
+						}
+
+						return round(tmpTotal / tmpDataPoints);
+					}
+
 					var alertAbovePercent = <%= alertAbovePercent || false %>;
 
 					var maxShown = true;
@@ -275,6 +304,8 @@
 						}
 					}
 
+					var alertOnData = 'average';
+
 					ctx = document.getElementById("Chart1").getContext("2d");
 					var pingLineChart = new Chart(ctx, {
 						type: 'line',
@@ -291,7 +322,7 @@
 								// https://stackoverflow.com/a/48151428
 								filter: function (tooltipItem, data) {
 									var label = data.datasets[tooltipItem.datasetIndex].label;
-									if (label === `${alertAbovePercent}% above average`) {
+									if (label === `${alertAbovePercent}% above average (${alertOnData})`) {
 										return false;
 									} else {
 										return true;
@@ -332,9 +363,10 @@
 										disableRedoAlertRender = false;
 										ci.data.datasets.pop();
 										ci.update();
-										showAlert(hiddenAlert);
+										showAlert(hiddenAlert, alertOnData);
+										//changeAlertData();
 									} else {
-										if (legendItemName === `${alertAbovePercent}% above average`) {
+										if (legendItemName === `${alertAbovePercent}% above average (${alertOnData})`) {
 											disableRedoAlertRender = true;
 										}
 										
@@ -386,13 +418,58 @@
 
 					window.lc = pingLineChart;
 
-					function showAlert(hideDataset) {
+					function changeAlertData() {
+						var allowedAlertDataOptions = ['average', 'min', 'max'];
+
+						var selectedAlertDataOption = document.getElementById('alertDataOption').value;
+
+						if (!allowedAlertDataOptions.includes(selectedAlertDataOption)) {
+							return;
+						}
+
+						alertOnData = selectedAlertDataOption;
+
+						var hiddenAlert = pingLineChart.getDatasetMeta(4).hidden;
+
+						pingLineChart.data.datasets.pop();
+						pingLineChart.update();
+						showAlert(hiddenAlert, alertOnData);
+					}
+
+					document.getElementById('loadBtnAlertData').addEventListener('click', function() {
+						changeAlertData();
+					});
+
+					function showAlert(hideAlerts, datasetName) {
 						if (alertAbovePercent) {
-							var times = lineChartData.datasets[1].data;
+							// average: 1
+							// min: 3
+							// max: 2
+
+							var dataset;
+
+							switch (datasetName) {
+								case 'average':
+									dataset =  1;
+									break;
+								case 'min':
+									dataset = 3;
+									break;
+								case 'max':
+									dataset = 2;
+									break;
+								default:
+									dataset = 1;
+							}
+
+							var times = lineChartData.datasets[dataset].data;
 
 							var alertTimes = [];
 							var alertDataset = [];
-							var alertAbove = round(total/dataPoints) * (1 + (alertAbovePercent / 100));
+							//var alertAbove = round(total/dataPoints) * (1 + (alertAbovePercent / 100));
+							var alertAbove = calculateAverageForDataset(dataset) * (1 + (alertAbovePercent / 100));
+
+							console.log(alertAbove);
 
 							for (var i = 0; i < times.length; i++) {
 								if (times[i].y > alertAbove) {
@@ -416,7 +493,7 @@
 							}
 
 							var alertDatasetConfig = {
-								label: `${alertAbovePercent}% above average`,
+								label: `${alertAbovePercent}% above average (${alertOnData})`,
 								borderColor: 'transparent',
 								backgroundColor: 'rgba(244, 32, 114, 0.15)',
 								pointRadius: 0,
@@ -424,13 +501,13 @@
 								pointBorderWidth: 0,
 								steppedLine: true,
 								data: alertDataset,
-								hidden: hideDataset
+								hidden: hideAlerts
 							};
 
 							pingLineChart.data.datasets.push(alertDatasetConfig);
 							pingLineChart.update();
 
-							pingLineChart.getDatasetMeta(4).hidden = hideDataset;
+							pingLineChart.getDatasetMeta(4).hidden = hideAlerts;
 						}
 					}
 
