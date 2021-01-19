@@ -483,12 +483,12 @@
 							for (var i = 0; i < times.length; i++) {
 								if (!alertTimes.includes(times[i])) {
 									var tmpData = Object.assign({}, times[i]);
-									tmpData.y = pingLineChart.scales['y-axis-0']._startValue;
+									tmpData.y = pingLineChart.scales['y-axis-0'].min;
 									console.log(`START: ${tmpData.y}`);
 									alertDataset.push(tmpData);
 								} else {
 									var tmpData = Object.assign({}, times[i]);
-									tmpData.y = pingLineChart.scales['y-axis-0']._endValue;
+									tmpData.y = pingLineChart.scales['y-axis-0'].max;
 									console.log(`END: ${tmpData.y}`);
 									alertDataset.push(tmpData);
 								}
