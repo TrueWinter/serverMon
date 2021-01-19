@@ -467,9 +467,7 @@
 							var alertTimes = [];
 							var alertDataset = [];
 							//var alertAbove = round(total/dataPoints) * (1 + (alertAbovePercent / 100));
-							var alertAbove = calculateAverageForDataset(dataset) * (1 + (alertAbovePercent / 100));
-
-							console.log(alertAbove);
+							var alertAbove = round(calculateAverageForDataset(dataset) * (1 + (alertAbovePercent / 100)));
 
 							for (var i = 0; i < times.length; i++) {
 								if (times[i].y > alertAbove) {
