@@ -419,8 +419,6 @@
 					});
 
 					window.lc = pingLineChart;
-					window.ctx = ctx;
-					window.lineChartData = lineChartData;
 					
 					function changeAlertData() {
 						var allowedAlertDataOptions = ['average', 'min', 'max'];
@@ -442,8 +440,6 @@
 						pingLineChart.update();
 						showAlert(hiddenAlert, alertOnData);
 					}
-
-					window.changeAlertData = changeAlertData;
 
 					document.getElementById('loadBtnAlertData').onclick = function() {
 						changeAlertData();
