@@ -68,7 +68,7 @@
 					</div>
 					<div class="chart-option">
 						Above average data:
-						<select id="alertDataOption" onkeydown="if (event.keyCode==13){changeAlertData()}" autocomplete="off">
+						<select id="alertDataOption" onkeydown="if (event.keyCode==13){this.nextElementSibling.click()}" autocomplete="off">
 							<option value="average" selected>Average</option>
 							<option value="min">Min</option>
 							<option value="max">Max</option>
@@ -419,7 +419,9 @@
 					});
 
 					window.lc = pingLineChart;
-
+					window.ctx = ctx;
+					window.lineChartData = lineChartData;
+					
 					function changeAlertData() {
 						var allowedAlertDataOptions = ['average', 'min', 'max'];
 
@@ -428,6 +430,9 @@
 						if (!allowedAlertDataOptions.includes(selectedAlertDataOption)) {
 							return;
 						}
+
+						document.getElementById('main-content-chart').style.filter = 'blur(5px)';
+						document.getElementById('main-content-chart').style.pointerEvents = 'none';
 
 						alertOnData = selectedAlertDataOption;
 
@@ -439,16 +444,11 @@
 					}
 
 					document.getElementById('loadBtnAlertData').addEventListener('click', function() {
-						document.getElementById('main-content-chart').style.filter = 'blur(5px)';
-						document.getElementById('main-content-chart').style.pointerEvents = 'none';
 						changeAlertData();
 					});
 
 					function showAlert(hideAlerts, datasetName) {
 						if (alertAbovePercent) {
-							// average: 1
-							// min: 3
-							// max: 2
 
 							var dataset;
 
@@ -516,11 +516,13 @@
 							pingLineChart.getDatasetMeta(4).hidden = hideAlerts;
 
 							document.getElementById('main-content-chart').style.filter = '';
-						document.getElementById('main-content-chart').style.pointerEvents = '';
+							document.getElementById('main-content-chart').style.pointerEvents = '';
 						}
 					}
 
 					showAlert(null);
+
+					window.sa = showAlert;
 				};
 				xhr.onerror = function() {
 					alert('An error occurred while loading ping data');
