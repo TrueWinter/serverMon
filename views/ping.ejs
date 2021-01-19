@@ -123,6 +123,8 @@
 				formSubmitted();
 			});
 
+			var alertOnData = 'average';
+
 			function loadChart(value, unit) {
 				document.getElementById('main-content-chart').style.filter = 'blur(5px)';
 				document.getElementById('main-content-chart').style.pointerEvents = 'none';
@@ -306,9 +308,7 @@
 						}
 					}
 
-					var alertOnData = 'average';
-
-					ctx = document.getElementById("Chart1").getContext("2d");
+					ctx = document.getElementById('Chart1').getContext('2d');
 					var pingLineChart = new Chart(ctx, {
 						type: 'line',
 						data: lineChartData,
@@ -443,9 +443,11 @@
 						showAlert(hiddenAlert, alertOnData);
 					}
 
-					document.getElementById('loadBtnAlertData').addEventListener('click', function() {
+					window.changeAlertData = changeAlertData;
+
+					document.getElementById('loadBtnAlertData').onclick = function() {
 						changeAlertData();
-					});
+					};
 
 					function showAlert(hideAlerts, datasetName) {
 						if (alertAbovePercent) {
@@ -473,8 +475,6 @@
 							//var alertAbove = round(total/dataPoints) * (1 + (alertAbovePercent / 100));
 							var alertAbove = round(calculateAverageForDataset(dataset) * (1 + (alertAbovePercent / 100)));
 
-							//console.log(alertAbove);
-
 							for (var i = 0; i < times.length; i++) {
 								if (times[i].y > alertAbove) {
 									if (i > 0) {
@@ -488,12 +488,10 @@
 								if (!alertTimes.includes(times[i])) {
 									var tmpData = Object.assign({}, times[i]);
 									tmpData.y = pingLineChart.scales['y-axis-0'].min;
-									//console.log(`START: ${tmpData.y}`);
 									alertDataset.push(tmpData);
 								} else {
 									var tmpData = Object.assign({}, times[i]);
 									tmpData.y = pingLineChart.scales['y-axis-0'].max;
-									//console.log(`END: ${tmpData.y}`);
 									alertDataset.push(tmpData);
 								}
 							}
@@ -520,7 +518,7 @@
 						}
 					}
 
-					showAlert(null);
+					showAlert(null, alertOnData);
 
 					window.sa = showAlert;
 				};
