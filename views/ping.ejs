@@ -469,6 +469,8 @@
 							//var alertAbove = round(total/dataPoints) * (1 + (alertAbovePercent / 100));
 							var alertAbove = round(calculateAverageForDataset(dataset) * (1 + (alertAbovePercent / 100)));
 
+							console.log(alertAbove);
+
 							for (var i = 0; i < times.length; i++) {
 								if (times[i].y > alertAbove) {
 									if (i > 0) {
@@ -482,10 +484,12 @@
 								if (!alertTimes.includes(times[i])) {
 									var tmpData = Object.assign({}, times[i]);
 									tmpData.y = pingLineChart.scales['y-axis-0']._startValue;
+									console.log(`START: ${tmpData.y}`);
 									alertDataset.push(tmpData);
 								} else {
 									var tmpData = Object.assign({}, times[i]);
 									tmpData.y = pingLineChart.scales['y-axis-0']._endValue;
+									console.log(`END: ${tmpData.y}`);
 									alertDataset.push(tmpData);
 								}
 							}
