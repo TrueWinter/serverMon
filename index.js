@@ -176,7 +176,7 @@ function ping(monitor, host, cb) {
 					};
 
 					emitSubscribedEvents(monitor, emitData, 'aboveAverage');
-					notify(monitor, `${alertAbovePercent} above average. 24 hour average: ${average}. Ping: ${data.avg}`);
+					notify(monitor, `${alertAbovePercent}% above average. 24 hour average: ${average}. Ping: ${data.avg}`);
 				}
 			});
 		}
