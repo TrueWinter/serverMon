@@ -22,8 +22,7 @@ var app = express();
 var hook = new Webhook(config.notifications.discord);
 
 function round(int) {
-	return int;
-	//return Math.round(int * 1000) / 1000; // Rounds to 3 decimal places
+	return Math.round(int * 1000) / 1000; // Rounds to 3 decimal places
 }
 
 if (config.customLogic.auth) {
@@ -139,7 +138,7 @@ function ping(monitor, host, cb) {
 		}
 		config.monitors[monitor].up = true;
 
-		db.insertPingResults(round(data.avg), round(data.max), round(data.min), monitor);
+		db.insertPingResults(data.avg, data.max, data.min, monitor);
 		// eslint-disable-next-line no-redeclare
 		var emitData = {
 			monitor,
@@ -148,6 +147,40 @@ function ping(monitor, host, cb) {
 			max: data.max
 		};
 		emitSubscribedEvents(monitor, emitData, 'ping');
+
+		if (config.monitors[monitor].notifyOnAboveAveragePercent && config.monitors[monitor].alertAbovePercent) {
+			db.getPingResults(1, monitor, function(err, dbData) {
+				if (err) {
+					return console.error(err);
+				}
+
+				var total = 0;
+				var dataPoints = 0;
+
+				for (var i = 0; i < dbData.length; i++) {
+					if (!isNaN(dbData[i].average)) {
+						total += dbData[i].average;
+						dataPoints++;
+					}
+				}
+
+				var average = round(total / dataPoints);
+				var alertAbovePercent = config.monitors[monitor].alertAbovePercent;
+				var alertAbove = round(average * (1 + (alertAbovePercent / 100)));
+
+				if (data.avg > alertAbove) {
+					var emitData = {
+						monitor,
+						timeAverage: average,
+						average: data.avg
+					};
+
+					emitSubscribedEvents(monitor, emitData, 'aboveAverage');
+					notify(monitor, `${alertAbovePercent} above average. 24 hour average: ${average}. Ping: ${data.avg}`);
+				}
+			});
+		}
+
 		return cb(null, `Monitor: ${monitor} | Minimum: ${data.min} | Maximum: ${data.max} | Average: ${data.avg}`);
 	});
 }
@@ -155,15 +188,16 @@ function ping(monitor, host, cb) {
 for (var monitor in config.monitors) {
 	// https://dzone.com/articles/why-does-javascript-loop-only-use-last-value
 	let mon = monitor;
-	console.log(monitor);
+	console.log(`Configuring cronjob for: ${monitor}`);
 	config.monitors[mon].up = true;
 	cron.schedule(config.monitors[mon].cron, function() {
-		console.log(mon);
+		console.log(`Pinging: ${mon}`);
+		// eslint-disable-next-line no-unused-vars
 		ping(mon, config.monitors[mon].ip, function(err, data) {
 			if (err) {
 				return console.log(err);
 			}
-			console.log(data);
+			//console.log(data);
 		});
 	});
 }

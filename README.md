@@ -11,6 +11,8 @@ Add your servers into the monitors object in config file with the following info
 	name: 'Name shown on status page',
 	ip: 'IP address (or domain name) of server',
 	cron: 'The monitor schedule in cron format',
+	alertAbovePercent: 'An average ping this percentage above the time period average will be highlighed in red on the ping chart and may trigger a notification (see next option)',
+	notifyOnAboveAveragePercent: 'If set to true, a notification will be sent if the average ping is `alertAbovePercent`% above the 24 hour average',
 	notify: 'This is an array stating where notifications for this monitor are sent'
 }
 ```
@@ -22,15 +24,21 @@ Example:
 	name: 'UK Loadbalancer 01',
 	ip: '198.51.100.21',
 	cron: '*/2 * * * *',
+	alertAbovePercent: 50,
+	notifyOnAboveAveragePercent: true,
 	notify: ['discord', 'pushover']
 }
 ```
 
-Configuring the notifications object in the config file will allow you to receive uptime/downtime notifications. Pushover, Discord webhooks and Telegram are supported. Notifications through custom logic is also now supported, see `custom-logic-examples/notifications.js` for more information.
+More examples are available in `config.js.example`.
+
+Configuring the notifications object in the config file will allow you to receive uptime/downtime notifications. Pushover, Discord webhooks and Telegram are supported. It can also be configured to alert you if the average is a certain percentage above the 24 hour average. Notifications through custom logic is also now supported, see `custom-logic-examples/notifications.js` for more information.
 
 It is recommended to use a proxy such as Nginx to proxy port 80 and 443 to ServerMon's port (18514).
 
 # Advanced Configuration (Optional)
+
+## Auth
 
 Some people may want to restrict access to ServerMon. To allow (almost) full control over this, authentication is handled through custom logic.
 
@@ -64,6 +72,21 @@ There are a few restrictions:
 - The logout route must be `/logout` as this is what will be used for the logout link on the monitors page
 
 An example has been included in `custom-logic-examples/simple-auth.js`.
+
+## Notifications
+
+Due to the limited number of currently supported notification platforms, custom notification logic has been added. This allows you to send notification to any platform or send ping data to an internal service.
+
+The following events are implemented:
+
+- down: emitted when a monitor is detected as being down
+- up: emitted when a previously down monitor is back up
+- ping: emitted when a monitor is successfully pinged
+- aboveAverage: emitted when the average ping is a percentage above the 24 hour average (see [#Configuration](configuration))
+
+To use custom notification logic enter a file name relative to the current directory in the config file at `customLogic.notifications`. Then add 'custom' to each monitor that you'd like to use custom notifications for.
+
+For more information, see the example at `custom-logic-examples/notifications.js`.
 
 # Usage
 

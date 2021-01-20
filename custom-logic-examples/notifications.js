@@ -8,8 +8,14 @@
 */
 
 var notificationsConfig = {
-	// You will only receive data for the following events. Possible values are ping, down, up
-	subscribedEvents: ['down', 'up']
+	/*
+		You will only receive data for the following events. Possible values are:
+		ping: emitted whenever a monitor is successfully pinged
+		down: emitted when a monitor is down
+		up: emitted when a monitor previously down monitor is back up
+		aboveAverage: emitted when the average ping is above the 24 hour average
+	*/
+	subscribedEvents: ['down', 'up', 'ping', 'aboveAverage']
 };
 
 function notifications(event) {
@@ -44,6 +50,18 @@ function notifications(event) {
 			Data contains the following:
 			monitor: the internal ID as set in the config
 			status: will be 'up'
+		*/
+		console.log(data);
+	});
+
+	event.on('aboveAverage', function(data) {
+		console.log('ABOVE AVERAGE');
+
+		/*
+			Data contains the following:
+			monitor: the internal ID as set in the config
+			timeAverage: the 24 hour average for this monitor
+			average: the average for this ping
 		*/
 		console.log(data);
 	});

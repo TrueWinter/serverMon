@@ -4,18 +4,24 @@ var config = {
 			name: 'UK Loadbalancer 01',
 			ip: '198.51.100.21',
 			cron: '*/2 * * * *',
+			alertAbovePercent: 50,
+			notifyOnAboveAveragePercent: true,
 			notify: ['discord', 'pushover']
 		},
 		'uk-prod-lb-02': {
 			name: 'UK Loadbalancer 02',
 			ip: '198.51.100.31',
 			cron: '*/2 * * * *',
+			alertAbovePercent: 50,
+			notifyOnAboveAveragePercent: true,
 			notify: ['discord', 'pushover']
 		},
 		'uk-dev-lb-01': {
 			name: 'UK Dev Loadbalancer 01',
 			ip: '198.51.100.95',
 			cron: '*/5 * * * *',
+			alertAbovePercent: 70,
+			notifyOnAboveAveragePercent: false,
 			notify: ['discord', 'custom']
 		}
 	},
