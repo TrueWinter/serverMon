@@ -30,7 +30,7 @@ Example:
 }
 ```
 
-More examples are available in `config.js.example`.
+More examples are available in `config.json.example`.
 
 Configuring the notifications object in the config file will allow you to receive uptime/downtime notifications. Pushover, Discord webhooks and Telegram are supported. It can also be configured to alert you if the average is a certain percentage above the 24 hour average. Notifications through custom logic is also now supported, see `custom-logic-examples/notifications.js` for more information.
 

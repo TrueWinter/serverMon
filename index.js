@@ -9,7 +9,7 @@ const Slimbot = require('slimbot');
 const { EventEmitter } = require('events');
 
 var db = require('./db.js');
-var config = require('./config.js');
+var config = require('./config.json');
 
 var slimbot;
 
