@@ -19,7 +19,11 @@ if (config.notifications.telegram.chatId && config.notifications.telegram.token)
 }
 
 var app = express();
-var hook = new Webhook(config.notifications.discord);
+var hook;
+
+if (config.notifications.discord) {
+	hook = new Webhook(config.notifications.discord);
+}
 
 function round(int) {
 	return Math.round(int * 1000) / 1000; // Rounds to 3 decimal places
@@ -62,15 +66,18 @@ Custom logic for notifications has been disabled.
 	}
 }
 
-function notify(monitor, event) {
-	if (config.notifications.pushover.user && config.notifications.pushover.token && config.monitors[monitor].notify.includes('pushover')) {
+function notify(monitor, event, customMessage) {
+	var monitorConfig = config.monitors[monitor];
+
+	if (config.notifications.pushover.user && config.notifications.pushover.token &&
+		((monitorConfig.notify.includes('pushover') && event !== 'aboveAverage') || (monitorConfig.notifyOnAboveAveragePercent.includes('pushover') && event === 'aboveAverage'))) {
 		var p = new Push({
 			user: config.notifications.pushover.user,
 			token: config.notifications.pushover.token
 		});
 
 		var msg = {
-			message: `New event from ServerMon: ${monitor} is ${event}`,
+			message: customMessage ? `New event from ServerMon: ${monitor} is ${customMessage}` : `New event from ServerMon: ${monitor} is ${event}`,
 			priority: config.notifications.pushover.priority || 0
 		};
 
@@ -83,16 +90,20 @@ function notify(monitor, event) {
 		});
 	}
 
-	if (config.notifications.discord && config.monitors[monitor].notify.includes('discord')) {
-		hook.send(`New event from ServerMon: ${monitor} is ${event}`);
+	if (config.notifications.discord &&
+		((monitorConfig.notify.includes('discord') && event !== 'aboveAverage') || (monitorConfig.notifyOnAboveAveragePercent.includes('discord') && event === 'aboveAverage'))) {
+		hook.send(customMessage ? `New event from ServerMon: ${monitor} is ${customMessage}` : `New event from ServerMon: ${monitor} is ${event}`);
 	}
 
-	if (config.notifications.telegram.chatId && config.notifications.telegram.token && config.monitors[monitor].notify.includes('telegram')) {
-		slimbot.sendMessage(config.notifications.telegram.chatId, `New event from ServerMon: ${monitor} is ${event}`);
+	if (config.notifications.telegram.chatId && config.notifications.telegram.token &&
+		((monitorConfig.notify.includes('telegram') && event !== 'aboveAverage') || (monitorConfig.notifyOnAboveAveragePercent.includes('telegram') && event === 'aboveAverage'))) {
+		slimbot.sendMessage(config.notifications.telegram.chatId, customMessage ? `New event from ServerMon: ${monitor} is ${customMessage}` : `New event from ServerMon: ${monitor} is ${event}`);
 	}
 }
 
 function emitSubscribedEvents(monitor, data, eventName) {
+	var monitorConfig = config.monitors[monitor];
+
 	if (!config.customLogic.notifications) {
 		return;
 	}
@@ -101,11 +112,9 @@ function emitSubscribedEvents(monitor, data, eventName) {
 		return;
 	}
 
-	if (!config.monitors[monitor].notify.includes('custom')) {
-		return;
+	if ((monitorConfig.notify.includes('custom') && eventName !== 'aboveAverage') || (monitorConfig.notifyOnAboveAveragePercent.includes('custom') && eventName === 'aboveAverage')) {
+		notificationEmitter.emit(eventName, data);
 	}
-
-	notificationEmitter.emit(eventName, data);
 }
 
 // Ping
@@ -176,7 +185,7 @@ function ping(monitor, host, cb) {
 					};
 
 					emitSubscribedEvents(monitor, emitData, 'aboveAverage');
-					notify(monitor, `${alertAbovePercent}% above average. 24 hour average: ${average}. Ping: ${data.avg}`);
+					notify(monitor, 'aboveAverage', `${alertAbovePercent}% above average. 24 hour average: ${average}. Ping: ${data.avg}`);
 				}
 			});
 		}

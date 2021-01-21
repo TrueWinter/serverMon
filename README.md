@@ -97,6 +97,9 @@ After configuring and starting ServerMon, the data can be viewed as graphs in a 
 
 By default, data from the past 24 hours is shown. The amount of data shown can be changed using the form above the graph. Please note that the chart points are hidden if three or more days of data is shown.
 
+# Updating
+
+Updating ServerMon is easy, just run `git pull` to get the latest code then `node migrations.js` to update the config file with any new development changes.
 
 # License
 
