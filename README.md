@@ -6,27 +6,27 @@ A simple uptime monitoring solution.
 
 Add your servers into the monitors object in config file with the following information:
 
-```js
-'internal-id': {
-	name: 'Name shown on status page',
-	ip: 'IP address (or domain name) of server',
-	cron: 'The monitor schedule in cron format',
-	alertAbovePercent: 'An average ping this percentage above the time period average will be highlighed in red on the ping chart and may trigger a notification (see next option)',
-	notifyOnAboveAveragePercent: 'If set to true, a notification will be sent if the average ping is `alertAbovePercent`% above the 24 hour average',
-	notify: 'This is an array stating where notifications for this monitor are sent'
+```json
+"internal-id": {
+	"name": "Name shown on status page",
+	"ip": "IP address (or domain name) of server",
+	"cron": "The monitor schedule in cron format",
+	"alertAbovePercent": "An average ping this percentage above the time period average will be highlighed in red on the ping chart and may trigger a notification (see next option)",
+	"notifyOnAboveAveragePercent": "If set to true, a notification will be sent if the average ping is `alertAbovePercent`% above the 24 hour average",
+	"notify": "This is an array stating where notifications for this monitor are sent"
 }
 ```
 
 Example:
 
-```js
-'uk-prod-lb-01': {
-	name: 'UK Loadbalancer 01',
-	ip: '198.51.100.21',
-	cron: '*/2 * * * *',
-	alertAbovePercent: 50,
-	notifyOnAboveAveragePercent: true,
-	notify: ['discord', 'pushover']
+```json
+"uk-prod-lb-01": {
+	"name": "UK Loadbalancer 01",
+	"ip": "198.51.100.21",
+	"cron": "*/2 * * * *",
+	"alertAbovePercent": 50,
+	"notifyOnAboveAveragePercent": true,
+	"notify": ["discord", "pushover"]
 }
 ```
 
