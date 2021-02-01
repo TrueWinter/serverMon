@@ -7,6 +7,16 @@ const Push = require('pushover-notifications');
 const Webhook = require('discord-webhook-node').Webhook;
 const Slimbot = require('slimbot');
 const { EventEmitter } = require('events');
+const migrateJSON = require('migrate-json');
+
+var mConfig = {
+	dataFile: path.join(__dirname, 'migrations', 'migrationData.json'), // A file used by Migrate-JSON to store migration data (will be created automatically if it doesn't exist)
+};
+
+if (!fs.existsSync(mConfig.dataFile)) {
+	var formattedDate = migrateJSON.formatDate(new Date());
+	migrateJSON.setTimestamp(mConfig, formattedDate);
+}
 
 var db = require('./db.js');
 var config = require('./config.json');

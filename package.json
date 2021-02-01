@@ -17,7 +17,7 @@
     "express-session": "^1.17.1",
     "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.12",
-    "migrate-json": "0.0.3",
+    "migrate-json": "0.0.4",
     "moment": "^2.29.1",
     "morgan": "^1.10.0",
     "node-cron": "^2.0.3",
