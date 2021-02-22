@@ -34,6 +34,8 @@ More examples are available in `config.json.example`.
 
 Configuring the notifications object in the config file will allow you to receive uptime/downtime notifications. Pushover, Discord webhooks and Telegram are supported. It can also be configured to alert you if the average is a certain percentage above the 24 hour average. Notifications through custom logic is also now supported, see `custom-logic-examples/notifications.js` for more information.
 
+A random delay (between 20ms and 500ms, by default) is added before each check. This is to prevent issues that may occur when a large number of monitors are configured, and can be modified if needed.
+
 It is recommended to use a proxy such as Nginx to proxy port 80 and 443 to ServerMon's port (18514).
 
 # Advanced Configuration (Optional)

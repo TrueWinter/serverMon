@@ -37,6 +37,10 @@
 			"token": ""
 		}
 	},
+	"additional": {
+		"randomDelayMin": 20,
+		"randomDelayMax": 500
+	},
 	"customLogic": {
 		"auth": "",
 		"notifications": ""

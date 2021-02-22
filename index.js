@@ -8,6 +8,7 @@ const Webhook = require('discord-webhook-node').Webhook;
 const Slimbot = require('slimbot');
 const { EventEmitter } = require('events');
 const migrateJSON = require('migrate-json');
+var randNum = require('random-number-between');
 
 var mConfig = {
 	dataFile: path.join(__dirname, 'migrations', 'migrationData.json'), // A file used by Migrate-JSON to store migration data (will be created automatically if it doesn't exist)
@@ -212,12 +213,15 @@ for (var monitor in config.monitors) {
 	cron.schedule(config.monitors[mon].cron, function() {
 		console.log(`Pinging: ${mon}`);
 		// eslint-disable-next-line no-unused-vars
-		ping(mon, config.monitors[mon].ip, function(err, data) {
-			if (err) {
-				return console.log(err);
-			}
-			//console.log(data);
-		});
+		setTimeout(function() {
+			console.log(Date.now());
+			ping(mon, config.monitors[mon].ip, function(err, data) {
+				if (err) {
+					return console.log(err);
+				}
+				//console.log(data);
+			});
+		}, randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
 	});
 }
 

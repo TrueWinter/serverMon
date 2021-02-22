@@ -1,6 +1,6 @@
 {
   "name": "tw-server-mon",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A network monitor ping specified servers at intervals",
   "main": "index.js",
   "scripts": {
@@ -23,6 +23,7 @@
     "node-cron": "^2.0.3",
     "ping": "^0.3.0",
     "pushover-notifications": "^1.2.2",
+    "random-number-between": "^1.0.3",
     "slimbot": "^5.0.0",
     "sqlite3": "^4.2.0"
   }
