@@ -214,7 +214,7 @@ for (var monitor in config.monitors) {
 		console.log(`Pinging: ${mon}`);
 		// eslint-disable-next-line no-unused-vars
 		setTimeout(function() {
-			console.log(Date.now());
+			//console.log(Date.now());
 			ping(mon, config.monitors[mon].ip, function(err, data) {
 				if (err) {
 					return console.log(err);
