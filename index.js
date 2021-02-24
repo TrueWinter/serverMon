@@ -262,7 +262,7 @@ for (var monitor in config.monitors) {
 			setTimeout(function() {
 				axios.get(config.monitors[mon].api).then(function(data) {
 					config.monitors[mon]._remoteData = data.data;
-					config.monitors[monitor].up = data.data.up;
+					config.monitors[mon].up = data.data.up;
 				}).catch(function(err) {
 					console.error(err);
 				});
@@ -273,7 +273,7 @@ for (var monitor in config.monitors) {
 			console.log(`Doing initial data fetch for: ${mon}`);
 			axios.get(config.monitors[mon].api).then(function(data) {
 				config.monitors[mon]._remoteData = data.data;
-				config.monitors[monitor].up = data.data.up;
+				config.monitors[mon].up = data.data.up;
 			}).catch(function(err) {
 				console.error(err);
 			});
