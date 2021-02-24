@@ -21,6 +21,7 @@ if (!fs.existsSync(mConfig.dataFile)) {
 
 var db = require('./db.js');
 var config = require('./config.json');
+const axios = require('axios');
 
 var slimbot;
 
@@ -208,21 +209,66 @@ function ping(monitor, host, cb) {
 for (var monitor in config.monitors) {
 	// https://dzone.com/articles/why-does-javascript-loop-only-use-last-value
 	let mon = monitor;
-	console.log(`Configuring cronjob for: ${monitor}`);
-	config.monitors[mon].up = true;
-	cron.schedule(config.monitors[mon].cron, function() {
-		console.log(`Pinging: ${mon}`);
-		// eslint-disable-next-line no-unused-vars
-		setTimeout(function() {
-			//console.log(Date.now());
-			ping(mon, config.monitors[mon].ip, function(err, data) {
-				if (err) {
-					return console.log(err);
-				}
-				//console.log(data);
-			});
-		}, randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
-	});
+	if (!config.monitors[mon].name) {
+		throw new Error('All monitors must have a name');
+	}
+	if (!config.monitors[mon].alertAbovePercent) {
+		throw new Error('All monitors must have an alertAbovePercent');
+	}
+	if (!config.monitors[mon].cron) {
+		throw new Error('All monitors must have a cron');
+	}
+	if (config.monitors[mon].type === 'local') {
+		if (!config.monitors[mon].ip) {
+			throw new Error('Local monitors must have an IP address');
+		}
+		if (!config.monitors[mon].notifyOnAboveAveragePercent) {
+			throw new Error('Local monitors must have a notifyOnAboveAveragePercent array, even if empty');
+		}
+		if (!config.monitors[mon].notify) {
+			throw new Error('Local monitors must have a notify array, even if empty');
+		}
+
+		console.log(`Configuring cronjob for: ${monitor}`);
+		config.monitors[mon].up = undefined;
+		cron.schedule(config.monitors[mon].cron, function() {
+			console.log(`Pinging: ${mon}`);
+			// eslint-disable-next-line no-unused-vars
+			setTimeout(function() {
+				//console.log(Date.now());
+				ping(mon, config.monitors[mon].ip, function(err, data) {
+					if (err) {
+						return console.log(err);
+					}
+					//console.log(data);
+				});
+			}, randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
+		});
+	} else {
+		if (!config.monitors[mon].api) {
+			throw new Error('Remote monitors must have an API');
+		}
+
+		config.monitors[mon].up = undefined;
+		config.monitors[mon]._remoteData = {
+			data: []
+		};
+
+		console.log(`Configuring cronjob for: ${monitor}`);
+
+		cron.schedule(config.monitors[mon].cron, function() {
+			console.log(`Fetching data for: ${mon}`);
+			// eslint-disable-next-line no-unused-vars
+			setTimeout(function() {
+				axios.get(config.monitors[mon].api).then(function(data) {
+					config.monitors[mon]._remoteData = data.data;
+					config.monitors[monitor].up = data.data.up;
+				}).catch(function(err) {
+					console.error(err);
+				});
+			}, randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
+		});
+	}
 }
 
 // Server
@@ -256,14 +302,18 @@ app.get('/api/ping/:monitor', function(req, res) {
 	if (req.query.h && req.query.h <= 24) h = req.query.h;
 	if (h) d = h / 24;
 
-	db.getPingResults(d, req.params.monitor, function(err, data) {
-		if (err) {
-			res.end(`Error querying database: ${err}`);
-			throw new Error(err);
-		}
+	if (config.monitors[req.params.monitor].type === 'local') {
+		db.getPingResults(d, req.params.monitor, function(err, data) {
+			if (err) {
+				res.end(`Error querying database: ${err}`);
+				throw new Error(err);
+			}
 
-		res.json({ data: data });
-	});
+			res.json({ data: data, up: config.monitors[req.params.monitor].up });
+		});
+	} else {
+		res.json(config.monitors[req.params.monitor]._remoteData);
+	}
 });
 
 app.listen(18514, function() {

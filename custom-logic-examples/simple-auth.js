@@ -24,6 +24,14 @@ function auth(app) {
 			return next();
 		}
 
+		if (req.originalUrl.startsWith('/api/')) {
+			if (req.query.apiKey === 'testapikey') {
+				return next();
+			} else {
+				return res.status(403).json({ success: false, message: 'Invalid API key provided' });
+			}
+		}
+
 		res.redirect('/login');
 	}
 

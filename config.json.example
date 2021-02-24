@@ -2,6 +2,7 @@
 	"monitors": {
 		"uk-prod-lb-01": {
 			"name": "UK Loadbalancer 01",
+			"type": "local",
 			"ip": "198.51.100.21",
 			"cron": "*/2 * * * *",
 			"alertAbovePercent": 50,
@@ -10,6 +11,7 @@
 		},
 		"uk-prod-lb-02": {
 			"name": "UK Loadbalancer 02",
+			"type": "local",
 			"ip": "198.51.100.31",
 			"cron": "*/2 * * * *",
 			"alertAbovePercent": 50,
@@ -18,11 +20,10 @@
 		},
 		"uk-dev-lb-01": {
 			"name": "UK Dev Loadbalancer 01",
-			"ip": "198.51.100.95",
+			"type": "remote",
+			"api": "http://198.51.100.4:18514/api/ping/uk-dev-lb-01",
 			"cron": "*/5 * * * *",
-			"alertAbovePercent": 70,
-			"notifyOnAboveAveragePercent": ["discord"],
-			"notify": ["discord", "custom"]
+			"alertAbovePercent": 70
 		}
 	},
 	"notifications": {

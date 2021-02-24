@@ -4,29 +4,48 @@
 		<title>Monitors</title>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<%- include('includes/css.ejs') %>
 		<style>
-			body {
-				background-color: #222;
-				color: white;
+			table, th, td {
+				border: 1px solid grey;
 			}
-			a {
-				color: lime;
+			td {
+				padding-top: 4px;
+				padding-bottom: 4px;
+				text-align: center;
 			}
-			a:hover, a:focus {
-				color:rgb(0, 255, 106);
+			table {
+				border-collapse: collapse;
+				width: 100%;
 			}
 		</style>
 	</head>
 	<body>
-		<h1>Monitors</h1>
-		<% if (customLogin) { %>
-			<a href="/logout">Logout</a>
-		<% } %>
-		<hr />
-		<% for (var monitor in monitors) { %>
-		<div>
-			<a href="/ping/<%= monitor %>"><%= monitor %></a>
+		<div class="main-content">
+			<h1>Monitors</h1>
+			<% if (customLogin) { %>
+				<a href="/logout">Logout</a>
+			<% } %>
+			<hr />
+			<table>
+				<thead>
+					<th>Monitor</th>
+					<th>Status</th>
+					<th>Type</th>
+				</thead>
+				<tbody>
+					<% for (var monitor in monitors) { %>
+						<% monitors[monitor].up === true ? monitors[monitor].state = 'up' : monitors[monitor].up === undefined ? monitors[monitor].state = 'unknown' : monitors[monitor].state = 'down' %>
+						<tr>
+							<td>
+								<a href="/ping/<%= monitor %>"><%= monitor %></a>
+							</td>
+							<td><%= monitors[monitor].state %></td>
+							<td><%= monitors[monitor].type %></td>
+						</tr>
+					<% } %>
+				</tbody>
+			</table>
 		</div>
-		<% } %>
 	</body>
 </html>

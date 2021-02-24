@@ -9,11 +9,13 @@ Add your servers into the monitors object in config file with the following info
 ```json
 "internal-id": {
 	"name": "Name shown on status page",
-	"ip": "IP address (or domain name) of server",
+	"type": "If set to local, this instance will do the monitoring. If set to remote, this instance will periodically fetch the monitor from the remote API",
+	"ip": "IP address (or domain name) of server. Only for local monitor types",
+	"api": "The URL that contains the remote monitor data. In a normal installation, this will be something like http://REMOTE_SERVERMON:18514/api/ping/MONITOR_NAME",
 	"cron": "The monitor schedule in cron format",
 	"alertAbovePercent": "An average ping this percentage above the time period average will be highlighed in red on the ping chart and may trigger a notification (see next option)",
-	"notifyOnAboveAveragePercent": "If set to true, a notification will be sent if the average ping is `alertAbovePercent`% above the 24 hour average",
-	"notify": "This is an array stating where notifications for this monitor are sent"
+	"notifyOnAboveAveragePercent": "If set to true, a notification will be sent if the average ping is `alertAbovePercent`% above the 24 hour average. Only for local monitor types",
+	"notify": "This is an array stating where notifications for this monitor are sent. Only for loca monitor types"
 }
 ```
 
@@ -22,10 +24,11 @@ Example:
 ```json
 "uk-prod-lb-01": {
 	"name": "UK Loadbalancer 01",
+	"type": "local",
 	"ip": "198.51.100.21",
 	"cron": "*/2 * * * *",
 	"alertAbovePercent": 50,
-	"notifyOnAboveAveragePercent": true,
+	"notifyOnAboveAveragePercent": ["discord"],
 	"notify": ["discord", "pushover"]
 }
 ```
