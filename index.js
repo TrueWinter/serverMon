@@ -148,7 +148,7 @@ function ping(monitor, host, cb) {
 			return cb(`Unable to ping ${host}`, null);
 		}
 
-		if (!config.monitors[monitor].up) {
+		if (!config.monitors[monitor].up && config.monitors[monitor].up !== undefined) {
 			notify(monitor, 'up');
 			// eslint-disable-next-line no-redeclare
 			var emitData = {
