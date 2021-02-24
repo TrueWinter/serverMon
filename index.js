@@ -266,7 +266,7 @@ for (var monitor in config.monitors) {
 				}).catch(function(err) {
 					console.error(err);
 				});
-			}, randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
+			}, 5000 + randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
 		});
 	}
 }
