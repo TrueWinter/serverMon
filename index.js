@@ -268,6 +268,16 @@ for (var monitor in config.monitors) {
 				});
 			}, 5000 + randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
 		});
+
+		setTimeout(function() {
+			console.log(`Doing initial data fetch for: ${mon}`);
+			axios.get(config.monitors[mon].api).then(function(data) {
+				config.monitors[mon]._remoteData = data.data;
+				config.monitors[monitor].up = data.data.up;
+			}).catch(function(err) {
+				console.error(err);
+			});
+		}, 5000 + randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
 	}
 }
 
