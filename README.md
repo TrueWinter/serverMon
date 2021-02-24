@@ -104,7 +104,7 @@ By default, data from the past 24 hours is shown. The amount of data shown can b
 
 # Updating
 
-Updating ServerMon is easy, just run `git pull` to get the latest code then `node migrations.js` to update the config file with any new development changes.
+Updating ServerMon is easy, just run `git pull` to get the latest code, `npm install` to install any new dependencies, and then `node migrations.js` to update the config file with any new development changes.
 
 # License
 
