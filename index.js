@@ -9,6 +9,7 @@ const Slimbot = require('slimbot');
 const { EventEmitter } = require('events');
 const migrateJSON = require('migrate-json');
 var randNum = require('random-number-between');
+var moment = require('moment');
 
 var mConfig = {
 	dataFile: path.join(__dirname, 'migrations', 'migrationData.json'), // A file used by Migrate-JSON to store migration data (will be created automatically if it doesn't exist)
@@ -294,7 +295,7 @@ app.get('/ping/:monitor', function(req, res) {
 		return res.end('Invalid monitor');
 	}
 
-	res.render('ping', { id: req.params.monitor, name: config.monitors[req.params.monitor].name, alertAbovePercent: config.monitors[req.params.monitor].alertAbovePercent || null });
+	res.render('ping', { id: req.params.monitor, name: config.monitors[req.params.monitor].name, alertAbovePercent: config.monitors[req.params.monitor].alertAbovePercent || null, local: config.monitors[req.params.monitor].type === 'local' });
 });
 
 app.get('/monitors', function(req, res) {
@@ -322,7 +323,17 @@ app.get('/api/ping/:monitor', function(req, res) {
 			res.json({ data: data, up: config.monitors[req.params.monitor].up });
 		});
 	} else {
-		res.json(config.monitors[req.params.monitor]._remoteData);
+		var day = 60 * 60 * 24; // 86400
+		var r = moment().unix() - (d * day);
+
+		var returnedData = Object.assign({}, config.monitors[req.params.monitor]._remoteData);
+		var filteredPingData = returnedData.data.filter(d => {
+			console.log(d);
+			return d.timestamp > r;
+		});
+		returnedData.data = filteredPingData;
+
+		res.json(returnedData);
 	}
 });
 
