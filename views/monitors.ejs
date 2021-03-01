@@ -51,7 +51,10 @@
 					<th>Type</th>
 				</thead>
 				<tbody>
+					<% var monCounter = 0;
 					<% for (var mon in monObj) { %>
+						<% monCounter++ %>
+						<% var monLast = Object.keys(monObj).length === monCounter %>
 						<% if (monObj[mon].group) { %>
 							<tr>
 								<td colspan="2"><%= monObj[mon].groupData.name %></td>
@@ -67,7 +70,11 @@
 									<% if (!last) { %>
 										<td class="group-indent"></td>
 									<% } else { %>
-										<td class="group-indent-last"></td>
+										<% if (!monLast) { %>
+											<td class="group-indent-last"></td>
+										<% } else %>
+											<td class="group-indent"></td>
+										<% } %>
 									<% } %>
 									<td><a href="/ping/<%= member %>"><%= member %></a></td>
 									<td><%= monObj[mon].members[member].state %></td>
