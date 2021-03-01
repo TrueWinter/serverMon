@@ -21,6 +21,23 @@
 		</style>
 	</head>
 	<body>
+		<% var monObj = {} %>
+		<% for (var group in groups) { %>
+			<% monObj[group] = { group: true, groupData: groups[group], members: {} } %>
+
+			<% for (var monitor in monitors) { %>
+				<% if (groups[group].members[monitor]) { %>
+					<% monObj[group].members[monitor] = monitors[monitor] %>
+					<% monitors[monitor].inGroup = true %>
+				<% } %>
+			<% } %>
+		<% } %>
+		<% for (var monitor in monitors) { %>
+			<% if (!monitors[monitor].inGroup) { %>
+				<% monObj[monitor] = monitors[monitor] %>
+			<% } %>
+		<% } %>
+
 		<div class="main-content">
 			<h1>Monitors</h1>
 			<% if (customLogin) { %>
@@ -29,20 +46,42 @@
 			<hr />
 			<table>
 				<thead>
-					<th>Monitor</th>
+					<th colspan="2">Monitor</th>
 					<th>Status</th>
 					<th>Type</th>
 				</thead>
 				<tbody>
-					<% for (var monitor in monitors) { %>
-						<% monitors[monitor].up === true ? monitors[monitor].state = 'up' : monitors[monitor].up === undefined ? monitors[monitor].state = 'unknown' : monitors[monitor].state = 'down' %>
-						<tr>
-							<td>
-								<a href="/ping/<%= monitor %>"><%= monitor %></a>
-							</td>
-							<td><%= monitors[monitor].state %></td>
-							<td><%= monitors[monitor].type %></td>
-						</tr>
+					<% for (var mon in monObj) { %>
+						<% if (monObj[mon].group) { %>
+							<tr>
+								<td colspan="2"><%= monObj[mon].groupData.name %></td>
+								<td><%= monObj[mon].groupData.status === undefined ? 'unknown' : monObj[mon].groupData.status %></td>
+								<td>group</td>
+							</tr>
+							<% var memberCounter = 0 %>
+							<% for (var member in monObj[mon].members) { %>
+								<% monObj[mon].members[member].up === true ? monObj[mon].members[member].state = 'up' : monObj[mon].members[member].up === undefined ? monObj[mon].members[member].state = 'unknown' : monitors[monitor].state = 'down' %>
+								<% memberCounter++ %>
+								<% var last = Object.keys(monObj[mon].members).length === memberCounter %>
+								<tr>
+									<% if (!last) { %>
+										<td class="group-indent"></td>
+									<% } else { %>
+										<td class="group-indent-last"></td>
+									<% } %>
+									<td><a href="/ping/<%= member %>"><%= member %></a></td>
+									<td><%= monObj[mon].members[member].state %></td>
+									<td><%= monObj[mon].members[member].type %></td>
+								</tr>
+							<% } %>
+						<% } else { %>
+							<% monObj[mon].up === true ? monObj[mon].state = 'up' : monObj[mon].up === undefined ? monObj[mon].state = 'unknown' : monitors[monitor].state = 'down' %>
+							<tr>
+								<td colspan="2" class="standalone-monitor"><a href="/ping/<%= mon %>"><%= mon %></a></td>
+								<td><%= monObj[mon].state %></td>
+								<td><%= monObj[mon].type %></td>
+							</tr>
+						<% } %>
 					<% } %>
 				</tbody>
 			</table>

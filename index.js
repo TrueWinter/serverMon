@@ -146,6 +146,18 @@ function ping(monitor, host, cb) {
 			}
 
 			config.monitors[monitor].up = false;
+
+			if (config.monitors[monitor].group) {
+				let group = config.groups[config.monitors[monitor].group];
+				if (group.status !== 'outage') {
+					if (group.members[monitor].statusIfDown === 'outage') {
+						group.status = 'outage';
+					} else if (group.members[monitor].statusIfDown === 'partial outage') {
+						group.status = 'partial outage';
+					}
+				}
+			}
+
 			return cb(`Unable to ping ${host}`, null);
 		}
 
@@ -203,8 +215,49 @@ function ping(monitor, host, cb) {
 			});
 		}
 
+		if (config.monitors[monitor].group) {
+			let group = config.groups[config.monitors[monitor].group];
+			let allowUpStatus = true;
+			let status = 'up';
+			if (group.status !== 'up') {
+				for (var member in group.members) {
+					if (group.members[member].statusIfDown === 'outage') {
+						if (!config.monitors[member].up) {
+							status = 'outage';
+							allowUpStatus = false;
+							if (config.monitors[member].up === undefined) {
+								status = 'unknown';
+							}
+						}
+					}
+					if (allowUpStatus) {
+						if (group.members[member].statusIfDown === 'partial outage') {
+							if (!config.monitors[member].up) {
+								status = 'partial outage';
+								allowUpStatus = false;
+								if (config.monitors[member].up === undefined) {
+									status = 'unknown';
+								}
+							}
+						}
+					}
+				}
+
+				group.status = status;
+			}
+		}
+
 		return cb(null, `Monitor: ${monitor} | Minimum: ${data.min} | Maximum: ${data.max} | Average: ${data.avg}`);
 	});
+}
+
+for (var group in config.groups) {
+	config.groups[group].status = undefined;
+	let groupMembers = config.groups[group].members;
+
+	for (var member in groupMembers) {
+		config.monitors[member].group = group;
+	}
 }
 
 for (var monitor in config.monitors) {
@@ -264,7 +317,61 @@ for (var monitor in config.monitors) {
 				axios.get(config.monitors[mon].api).then(function(data) {
 					config.monitors[mon]._remoteData = data.data;
 					config.monitors[mon].up = data.data.up;
+
+					if (!config.monitors[mon].up) {
+						if (config.monitors[mon].group) {
+							let group = config.groups[config.monitors[mon].group];
+							if (group.status !== 'outage') {
+								if (group.members[mon].statusIfDown === 'outage') {
+									group.status = 'outage';
+								} else if (group.members[mon].statusIfDown === 'partial outage') {
+									group.status = 'partial outage';
+								}
+							}
+						}
+					} else if (config.monitors[mon].group) {
+						let group = config.groups[config.monitors[mon].group];
+						let allowUpStatus = true;
+						let status = 'up';
+						if (group.status !== 'up') {
+							for (var member in group.members) {
+								if (group.members[member].statusIfDown === 'outage') {
+									if (!config.monitors[member].up) {
+										status = 'outage';
+										allowUpStatus = false;
+										if (config.monitors[member].up === undefined) {
+											status = 'unknown';
+										}
+									}
+								}
+								if (allowUpStatus) {
+									if (group.members[member].statusIfDown === 'partial outage') {
+										if (!config.monitors[member].up) {
+											status = 'partial outage';
+											allowUpStatus = false;
+											if (config.monitors[member].up === undefined) {
+												status = 'unknown';
+											}
+										}
+									}
+								}
+							}
+
+							group.status = status;
+						}
+					}
 				}).catch(function(err) {
+					config.monitors[mon].up = undefined;
+					if (config.monitors[mon].group) {
+						let group = config.groups[config.monitors[mon].group];
+						if (group.status !== 'outage') {
+							if (group.members[mon].statusIfDown === 'outage') {
+								group.status = 'outage';
+							} else if (group.members[mon].statusIfDown === 'partial outage') {
+								group.status = 'partial outage';
+							}
+						}
+					}
 					console.error(err);
 				});
 			}, 5000 + randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
@@ -275,7 +382,60 @@ for (var monitor in config.monitors) {
 			axios.get(config.monitors[mon].api).then(function(data) {
 				config.monitors[mon]._remoteData = data.data;
 				config.monitors[mon].up = data.data.up;
+
+				if (!config.monitors[mon].up) {
+					if (config.monitors[mon].group) {
+						let group = config.groups[config.monitors[mon].group];
+						if (group.status !== 'outage') {
+							if (group.members[mon].statusIfDown === 'outage') {
+								group.status = 'outage';
+							} else if (group.members[mon].statusIfDown === 'partial outage') {
+								group.status = 'partial outage';
+							}
+						}
+					}
+				} else if (config.monitors[mon].group) {
+					let group = config.groups[config.monitors[mon].group];
+					let allowUpStatus = true;
+					let status = 'up';
+					if (group.status !== 'up') {
+						for (var member in group.members) {
+							if (group.members[member].statusIfDown === 'outage') {
+								if (!config.monitors[member].up) {
+									status = 'outage';
+									allowUpStatus = false;
+									if (config.monitors[member].up === undefined) {
+										status = 'unknown';
+									}
+								}
+							}
+							if (allowUpStatus) {
+								if (group.members[member].statusIfDown === 'partial outage') {
+									if (!config.monitors[member].up) {
+										status = 'partial outage';
+										allowUpStatus = false;
+										if (config.monitors[member].up === undefined) {
+											status = 'unknown';
+										}
+									}
+								}
+							}
+						}
+
+						group.status = status;
+					}
+				}
 			}).catch(function(err) {
+				if (config.monitors[mon].group) {
+					let group = config.groups[config.monitors[mon].group];
+					if (group.status !== 'outage') {
+						if (group.members[mon].statusIfDown === 'outage') {
+							group.status = 'outage';
+						} else if (group.members[mon].statusIfDown === 'partial outage') {
+							group.status = 'partial outage';
+						}
+					}
+				}
 				console.error(err);
 			});
 		}, 5000 + randNum(config.additional.randomDelayMin, config.additional.randomDelayMax, 1)[0]);
@@ -299,7 +459,7 @@ app.get('/ping/:monitor', function(req, res) {
 });
 
 app.get('/monitors', function(req, res) {
-	res.render('monitors', { monitors: config.monitors, customLogin: config.customLogic.auth ? true : false });
+	res.render('monitors', { monitors: config.monitors, customLogin: config.customLogic.auth ? true : false, groups: config.groups });
 });
 
 app.get('/api/ping/:monitor', function(req, res) {

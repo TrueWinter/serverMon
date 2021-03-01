@@ -1,4 +1,17 @@
 {
+	"groups": {
+		"prod": {
+			"name": "Production",
+			"members": {
+				"uk-prod-lb-01": {
+					"statusIfDown": "partial outage"
+				},
+				"uk-prod-lb-02": {
+					"statusIfDown": "partial outage"
+				}
+			}
+		}
+	},
 	"monitors": {
 		"uk-prod-lb-01": {
 			"name": "UK Loadbalancer 01",
