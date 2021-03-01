@@ -467,7 +467,7 @@ app.get('/monitors', function(req, res) {
 
 app.get('/api/ping/:monitor', function(req, res) {
 	if (!Object.prototype.hasOwnProperty.call(config.monitors, req.params.monitor)) {
-		return res.end('Invalid monitor');
+		return res.status(400).json({ success: false, message: 'Invalid monitor' });
 	}
 
 	var d = 1;
@@ -498,6 +498,14 @@ app.get('/api/ping/:monitor', function(req, res) {
 
 		res.json(returnedData);
 	}
+});
+
+app.get('/api/group/:group', function(req, res) {
+	if (!Object.prototype.hasOwnProperty.call(config.groups, req.params.group)) {
+		return res.status(400).json({ success: false, message: 'Invalid group' });
+	}
+
+	res.json({ name: config.groups[req.params.group].name, status: (config.groups[req.params.group].status === undefined ? 'unknown' : config.groups[req.params.group].status) });
 });
 
 app.listen(18514, function() {
