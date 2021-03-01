@@ -256,6 +256,9 @@ for (var group in config.groups) {
 	let groupMembers = config.groups[group].members;
 
 	for (var member in groupMembers) {
+		if (!Object.prototype.hasOwnProperty.call(config.monitors, member)) {
+			throw new Error(`Group member ${member} does not exist`);
+		}
 		config.monitors[member].group = group;
 	}
 }
