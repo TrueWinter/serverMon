@@ -56,7 +56,7 @@
 						<% monCounter++ %>
 						<% var monLast = Object.keys(monObj).length === monCounter %>
 						<% if (monObj[mon].group) { %>
-							<tr>
+							<tr class="group-heading">
 								<td colspan="2"><%= monObj[mon].groupData.name %></td>
 								<td><%= monObj[mon].groupData.status === undefined ? 'unknown' : monObj[mon].groupData.status %></td>
 								<td>group</td>
