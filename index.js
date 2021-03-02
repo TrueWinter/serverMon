@@ -293,6 +293,7 @@ for (var monitor in config.monitors) {
 			// eslint-disable-next-line no-unused-vars
 			setTimeout(function() {
 				//console.log(Date.now());
+				// eslint-disable-next-line no-unused-vars
 				ping(mon, config.monitors[mon].ip, function(err, data) {
 					if (err) {
 						return console.log(err);
@@ -489,14 +490,21 @@ app.get('/api/ping/:monitor', function(req, res) {
 		var day = 60 * 60 * 24; // 86400
 		var r = moment().unix() - (d * day);
 
-		var returnedData = Object.assign({}, config.monitors[req.params.monitor]._remoteData);
-		var filteredPingData = returnedData.data.filter(d => {
-			console.log(d);
-			return d.timestamp > r;
-		});
-		returnedData.data = filteredPingData;
+		if (d <= 1) {
+			var returnedData = Object.assign({}, config.monitors[req.params.monitor]._remoteData);
+			var filteredPingData = returnedData.data.filter(d => d.timestamp > r);
+			returnedData.data = filteredPingData;
 
-		res.json(returnedData);
+			res.json(returnedData);
+		} else {
+			var apiURL = new URL(config.monitors[req.params.monitor].api);
+			apiURL.searchParams.append('d', d);
+
+			console.log(`User requested more than a day of data for remote monitor. Sending request to ${apiURL.href}`);
+			axios.get(apiURL.href).then(function(data) {
+				res.json(data.data);
+			});
+		}
 	}
 });
 
@@ -505,7 +513,7 @@ app.get('/api/group/:group', function(req, res) {
 		return res.status(400).json({ success: false, message: 'Invalid group' });
 	}
 
-	res.json({ name: config.groups[req.params.group].name, status: (config.groups[req.params.group].status === undefined ? 'unknown' : config.groups[req.params.group].status) });
+	res.json({ name: config.groups[req.params.group].name, status: config.groups[req.params.group].status === undefined ? 'unknown' : config.groups[req.params.group].status });
 });
 
 app.listen(18514, function() {

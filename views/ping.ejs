@@ -23,11 +23,9 @@
 					<div class="chart-option">
 						Change graph time period:
 						<input type="text" id="timeValue" onkeydown="if (event.keyCode==13){formSubmitted()}" pattern="[0-9]{1,2}" maxlength="2" size="2" autocomplete="off" />
-						<select id="timeUnit" onkeydown="if (event.keyCode==13){formSubmitted()}" autocomplete="off" <% if (!local) {%>disabled title="Only data from the past 24 hours is available on remote monitors"<% } %>>
+						<select id="timeUnit" onkeydown="if (event.keyCode==13){formSubmitted()}" autocomplete="off">
 							<option value="hours">hours</option>
-							<% if (local) { %>
-								<option value="days">days</option>
-							<% } %>
+							<option value="days">days</option>
 						</select>
 						<button type="button" id="loadBtn">Load</button>
 					</div>
