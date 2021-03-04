@@ -449,6 +449,7 @@ for (var monitor in config.monitors) {
 // Server
 
 app.set('view engine', 'ejs');
+app.use('/assets', express.static(path.join(__dirname, 'assets')));
 
 app.get('/', function(req, res) {
 	res.redirect('/monitors');
@@ -459,7 +460,7 @@ app.get('/ping/:monitor', function(req, res) {
 		return res.end('Invalid monitor');
 	}
 
-	res.render('ping', { id: req.params.monitor, name: config.monitors[req.params.monitor].name, alertAbovePercent: config.monitors[req.params.monitor].alertAbovePercent || null, local: config.monitors[req.params.monitor].type === 'local' });
+	res.render('ping', { id: req.params.monitor, name: config.monitors[req.params.monitor].name, alertAbovePercent: config.monitors[req.params.monitor].alertAbovePercent || null, local: config.monitors[req.params.monitor].type === 'local', useLocalAssets: config.additional.useLocalAssets });
 });
 
 app.get('/monitors', function(req, res) {

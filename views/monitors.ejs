@@ -63,7 +63,7 @@
 							</tr>
 							<% var memberCounter = 0 %>
 							<% for (var member in monObj[mon].members) { %>
-								<% monObj[mon].members[member].up === true ? monObj[mon].members[member].state = 'up' : monObj[mon].members[member].up === undefined ? monObj[mon].members[member].state = 'unknown' : monitors[monitor].state = 'down' %>
+								<% monObj[mon].members[member].up === true ? monObj[mon].members[member].state = 'up' : monObj[mon].members[member].up === undefined ? monObj[mon].members[member].state = 'unknown' : monObj[mon].members[member].state = 'down' %>
 								<% memberCounter++ %>
 								<% var last = Object.keys(monObj[mon].members).length === memberCounter %>
 								<tr>
@@ -77,7 +77,7 @@
 										<% } %>
 									<% } %>
 									<td><a href="/ping/<%= member %>"><%= member %></a></td>
-									<td><%= monObj[mon].members[member].state %></td>
+									<td><%= monObj[mon].members[member].state %> (<%= monObj[mon].members[member].up %>)</td>
 									<td><%= monObj[mon].members[member].type %></td>
 								</tr>
 							<% } %>

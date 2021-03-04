@@ -1,6 +1,6 @@
 {
   "name": "tw-server-mon",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A network monitor ping specified servers at intervals",
   "main": "index.js",
   "scripts": {

@@ -2,7 +2,11 @@
 <html>
 	<head>
 		<title>Ping</title>
-		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css" />
+		<% if (!useLocalAssets) { %>
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.css" />
+		<% } else { %>
+			<link rel="stylesheet" href="/assets/css/Chart.min.css" />
+		<% } %>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<%- include('includes/css.ejs') %>
@@ -45,8 +49,13 @@
 				</div>
 			</div>
 		</div>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+		<% if (!useLocalAssets) { %>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+		<% } else { %>
+			<script src="/assets/js/moment.min.js"></script>
+			<script src="/assets/js/Chart.min.js"></script>
+		<% } %>
 		<script>
 			function formSubmitted() {
 				var value = document.getElementById('timeValue').value;
