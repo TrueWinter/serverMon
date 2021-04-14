@@ -2,14 +2,7 @@
 	"groups": {
 		"prod": {
 			"name": "Production",
-			"members": {
-				"uk-prod-lb-01": {
-					"statusIfDown": "partial outage"
-				},
-				"uk-prod-lb-02": {
-					"statusIfDown": "partial outage"
-				}
-			}
+			"members": ["uk-prod-lb-01", "uk-prod-lb-02"]
 		}
 	},
 	"monitors": {

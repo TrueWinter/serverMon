@@ -26,7 +26,7 @@
 			<% monObj[group] = { group: true, groupData: groups[group], members: {} } %>
 
 			<% for (var monitor in monitors) { %>
-				<% if (groups[group].members[monitor]) { %>
+				<% if (groups[group].members.includes(monitor)) { %>
 					<% monObj[group].members[monitor] = monitors[monitor] %>
 					<% monitors[monitor].inGroup = true %>
 				<% } %>
@@ -55,7 +55,7 @@
 					<% for (var mon in monObj) { %>
 						<% monCounter++ %>
 						<% var monLast = Object.keys(monObj).length === monCounter %>
-						<% if (monObj[mon].group) { %>
+						<% if (monObj[mon].groupData) { %>
 							<tr class="group-heading">
 								<td colspan="2"><%= monObj[mon].groupData.name %></td>
 								<td><%= monObj[mon].groupData.status === undefined ? 'unknown' : monObj[mon].groupData.status %></td>
