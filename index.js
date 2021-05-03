@@ -168,11 +168,16 @@ function ping(monitor, host, cb) {
 				let groupMonitorsDown = filterObject(groupMonitors, function(p) {
 					return p.up === false;
 				});
+				let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+					return p.up === undefined;
+				});
 				let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
 				if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 					group.status = 'outage';
 				} else if (groupMonitorsDownArr.length > 0) {
 					group.status = 'partial outage';
+				} else if (groupMonitorsUnknown > 0) {
+					group.status = 'unknown';
 				} else {
 					group.status = 'up';
 				}
@@ -244,11 +249,16 @@ function ping(monitor, host, cb) {
 			let groupMonitorsDown = filterObject(groupMonitors, function(p) {
 				return p.up === false;
 			});
+			let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+				return p.up === undefined;
+			});
 			let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
 			if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 				group.status = 'outage';
 			} else if (groupMonitorsDownArr.length > 0) {
 				group.status = 'partial outage';
+			} else if (groupMonitorsUnknown > 0) {
+				group.status = 'unknown';
 			} else {
 				group.status = 'up';
 			}
@@ -339,11 +349,16 @@ for (var monitor in config.monitors) {
 						let groupMonitorsDown = filterObject(groupMonitors, function(p) {
 							return p.up === false;
 						});
+						let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+							return p.up === undefined;
+						});
 						let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
 						if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 							group.status = 'outage';
 						} else if (groupMonitorsDownArr.length > 0) {
 							group.status = 'partial outage';
+						} else if (groupMonitorsUnknown > 0) {
+							group.status = 'unknown';
 						} else {
 							group.status = 'up';
 						}
@@ -359,11 +374,16 @@ for (var monitor in config.monitors) {
 						let groupMonitorsDown = filterObject(groupMonitors, function(p) {
 							return p.up === false;
 						});
+						let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+							return p.up === undefined;
+						});
 						let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
 						if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 							group.status = 'outage';
 						} else if (groupMonitorsDownArr.length > 0) {
 							group.status = 'partial outage';
+						} else if (groupMonitorsUnknown > 0) {
+							group.status = 'unknown';
 						} else {
 							group.status = 'up';
 						}
@@ -388,11 +408,16 @@ for (var monitor in config.monitors) {
 					let groupMonitorsDown = filterObject(groupMonitors, function(p) {
 						return p.up === false;
 					});
+					let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+						return p.up === undefined;
+					});
 					let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
 					if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 						group.status = 'outage';
 					} else if (groupMonitorsDownArr.length > 0) {
 						group.status = 'partial outage';
+					} else if (groupMonitorsUnknown > 0) {
+						group.status = 'unknown';
 					} else {
 						group.status = 'up';
 					}
@@ -407,11 +432,16 @@ for (var monitor in config.monitors) {
 					let groupMonitorsDown = filterObject(groupMonitors, function(p) {
 						return p.up === false;
 					});
+					let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+						return p.up === undefined;
+					});
 					let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
 					if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 						group.status = 'outage';
 					} else if (groupMonitorsDownArr.length > 0) {
 						group.status = 'partial outage';
+					} else if (groupMonitorsUnknown > 0) {
+						group.status = 'unknown';
 					} else {
 						group.status = 'up';
 					}
