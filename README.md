@@ -35,7 +35,7 @@ Example:
 
 More examples are available in `config.json.example`.
 
-Configuring the notifications object in the config file will allow you to receive uptime/downtime notifications. Pushover, Discord webhooks and Telegram are supported. It can also be configured to alert you if the average is a certain percentage above the 24 hour average. Notifications through custom logic is also now supported, see `custom-logic-examples/notifications.js` for more information.
+Configuring the notifications object in the config file will allow you to receive uptime/downtime notifications. Pushover, Discord webhooks and Telegram are supported. It can also be configured to alert you if the average is a certain percentage above the 24 hour average. Notifications through custom logic is also now supported, see `custom-logic-examples/notifications.js` and the [notifications section below](#notifications) for more information.
 
 A random delay (between 20ms and 500ms, by default) is added before each check. This is to prevent issues that may occur when a large number of monitors are configured, and can be modified if needed.
 
@@ -89,9 +89,10 @@ The following events are implemented:
 - down: emitted when a monitor is detected as being down
 - up: emitted when a previously down monitor is back up
 - ping: emitted when a monitor is successfully pinged
-- aboveAverage: emitted when the average ping is a percentage above the 24 hour average (see [#Configuration](configuration))
+- aboveAverage: emitted when the average ping is a percentage above the 24 hour average (see [#Configuration](#configuration))
+- groupStatusChange: emitted when the status of a group changes
 
-To use custom notification logic enter a file name relative to the current directory in the config file at `customLogic.notifications`. Then add 'custom' to each monitor that you'd like to use custom notifications for.
+To use custom notification logic enter a file name relative to the current directory in the config file at `customLogic.notifications`. Then add 'custom' to each monitor that you'd like to use custom notifications for. For groups, the `groupStatusChange` event is automatically enabled.
 
 For more information, see the example at `custom-logic-examples/notifications.js`.
 
@@ -103,6 +104,16 @@ After configuring and starting ServerMon, the data can be viewed as graphs in a 
 - `{servermon_domain}/ping/{internal_id}` will show a graph of data collected for that monitor
 
 By default, data from the past 24 hours is shown. The amount of data shown can be changed using the form above the graph. Please note that the chart points are hidden if three or more days of data is shown.
+
+An API is also available:
+
+- `{servermon_domain}/api/ping/{internal-id}` will return the ping data for the past 24 hours as well as the current status
+- `{servermon_domain}/api/group/{internal-id}` will return the current status of the group
+
+For the ping API route, you can modify the amount of data returned using the following query parameters (cannot be used together):
+
+- `?h=x` will return the past `x` hours of data, up to 24 hours
+- `?d=x` will return the past `x` days of data, up to 30 days
 
 # Updating
 

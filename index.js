@@ -137,6 +137,10 @@ function emitSubscribedEvents(monitor, data, eventName) {
 		return;
 	}
 
+	if (monitor.startsWith('group:')) {
+		return notificationEmitter.emit(eventName, data);
+	}
+
 	if ((monitorConfig.notify.includes('custom') && eventName !== 'aboveAverage') || (monitorConfig.notifyOnAboveAveragePercent.includes('custom') && eventName === 'aboveAverage')) {
 		notificationEmitter.emit(eventName, data);
 	}
@@ -174,6 +178,7 @@ function ping(monitor, host, cb) {
 				});
 				let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
+				let _prevGroupStatus = group.status;
 				if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 					group.status = 'outage';
 				} else if (groupMonitorsDownArr.length > 0) {
@@ -182,6 +187,15 @@ function ping(monitor, host, cb) {
 					group.status = 'unknown';
 				} else {
 					group.status = 'up';
+				}
+
+				if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+					var _emitData = {
+						group: config.monitors[monitor].group,
+						monitors: groupMonitorsArr,
+						status: group.status
+					};
+					emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
 				}
 			}
 
@@ -257,6 +271,7 @@ function ping(monitor, host, cb) {
 			});
 			let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
+			let _prevGroupStatus = group.status;
 			if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 				group.status = 'outage';
 			} else if (groupMonitorsDownArr.length > 0) {
@@ -265,6 +280,16 @@ function ping(monitor, host, cb) {
 				group.status = 'unknown';
 			} else {
 				group.status = 'up';
+			}
+
+			if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+				// eslint-disable-next-line no-redeclare
+				var _emitData = {
+					group: config.monitors[monitor].group,
+					monitors: groupMonitorsArr,
+					status: group.status
+				};
+				emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
 			}
 		}
 
@@ -359,6 +384,7 @@ for (var monitor in config.monitors) {
 						});
 						let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
+						let _prevGroupStatus = group.status;
 						if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 							group.status = 'outage';
 						} else if (groupMonitorsDownArr.length > 0) {
@@ -367,6 +393,15 @@ for (var monitor in config.monitors) {
 							group.status = 'unknown';
 						} else {
 							group.status = 'up';
+						}
+
+						if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+							var _emitData = {
+								group: config.monitors[monitor].group,
+								monitors: groupMonitorsArr,
+								status: group.status
+							};
+							emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
 						}
 					}
 				}).catch(function(err) {
@@ -386,6 +421,7 @@ for (var monitor in config.monitors) {
 						});
 						let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
+						let _prevGroupStatus = group.status;
 						if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 							group.status = 'outage';
 						} else if (groupMonitorsDownArr.length > 0) {
@@ -394,6 +430,15 @@ for (var monitor in config.monitors) {
 							group.status = 'unknown';
 						} else {
 							group.status = 'up';
+						}
+
+						if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+							var _emitData = {
+								group: config.monitors[monitor].group,
+								monitors: groupMonitorsArr,
+								status: group.status
+							};
+							emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
 						}
 					}
 					console.error(err.message);
@@ -422,6 +467,7 @@ for (var monitor in config.monitors) {
 					});
 					let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
+					let _prevGroupStatus = group.status;
 					if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 						group.status = 'outage';
 					} else if (groupMonitorsDownArr.length > 0) {
@@ -430,6 +476,15 @@ for (var monitor in config.monitors) {
 						group.status = 'unknown';
 					} else {
 						group.status = 'up';
+					}
+
+					if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+						var _emitData = {
+							group: config.monitors[monitor].group,
+							monitors: groupMonitorsArr,
+							status: group.status
+						};
+						emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
 					}
 				}
 			}).catch(function(err) {
@@ -448,6 +503,7 @@ for (var monitor in config.monitors) {
 					});
 					let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
+					let _prevGroupStatus = group.status;
 					if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 						group.status = 'outage';
 					} else if (groupMonitorsDownArr.length > 0) {
@@ -456,6 +512,15 @@ for (var monitor in config.monitors) {
 						group.status = 'unknown';
 					} else {
 						group.status = 'up';
+					}
+
+					if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+						var _emitData = {
+							group: config.monitors[monitor].group,
+							monitors: groupMonitorsArr,
+							status: group.status
+						};
+						emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
 					}
 				}
 				console.error(err.message);

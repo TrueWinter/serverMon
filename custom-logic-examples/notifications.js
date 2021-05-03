@@ -15,7 +15,7 @@ var notificationsConfig = {
 		up: emitted when a monitor previously down monitor is back up
 		aboveAverage: emitted when the average ping is above the 24 hour average
 	*/
-	subscribedEvents: ['down', 'up', 'ping', 'aboveAverage']
+	subscribedEvents: ['down', 'up', 'ping', 'aboveAverage', 'groupStatusChange']
 };
 
 function notifications(event) {
@@ -63,6 +63,19 @@ function notifications(event) {
 			timeAverage: the 24 hour average for this monitor
 			average: the average for this ping
 		*/
+		console.log(data);
+	});
+
+	event.on('groupStatusChange', function(data) {
+		console.log('GROUP STATUS CHANGE');
+
+		/*
+			Data contains the following:
+			group: the internal ID as set in the config
+			monitors: an array of monitors
+			status: the group status
+		*/
+
 		console.log(data);
 	});
 }
