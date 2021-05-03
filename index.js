@@ -169,10 +169,17 @@ function ping(monitor, host, cb) {
 					return p.up === false;
 				});
 				let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+				let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+					return p.up === undefined;
+				});
+				let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+
 				if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 					group.status = 'outage';
 				} else if (groupMonitorsDownArr.length > 0) {
 					group.status = 'partial outage';
+				} else if (groupMonitorsUnknownArr.length > 0) {
+					group.status = 'unknown';
 				} else {
 					group.status = 'up';
 				}
@@ -245,10 +252,17 @@ function ping(monitor, host, cb) {
 				return p.up === false;
 			});
 			let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+			let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+				return p.up === undefined;
+			});
+			let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+
 			if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 				group.status = 'outage';
 			} else if (groupMonitorsDownArr.length > 0) {
 				group.status = 'partial outage';
+			} else if (groupMonitorsUnknownArr.length > 0) {
+				group.status = 'unknown';
 			} else {
 				group.status = 'up';
 			}
@@ -340,10 +354,17 @@ for (var monitor in config.monitors) {
 							return p.up === false;
 						});
 						let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+						let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+							return p.up === undefined;
+						});
+						let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+
 						if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 							group.status = 'outage';
 						} else if (groupMonitorsDownArr.length > 0) {
 							group.status = 'partial outage';
+						} else if (groupMonitorsUnknownArr.length > 0) {
+							group.status = 'unknown';
 						} else {
 							group.status = 'up';
 						}
@@ -360,10 +381,17 @@ for (var monitor in config.monitors) {
 							return p.up === false;
 						});
 						let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+						let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+							return p.up === undefined;
+						});
+						let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+
 						if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 							group.status = 'outage';
 						} else if (groupMonitorsDownArr.length > 0) {
 							group.status = 'partial outage';
+						} else if (groupMonitorsUnknownArr.length > 0) {
+							group.status = 'unknown';
 						} else {
 							group.status = 'up';
 						}
@@ -389,10 +417,17 @@ for (var monitor in config.monitors) {
 						return p.up === false;
 					});
 					let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+					let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+						return p.up === undefined;
+					});
+					let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+
 					if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 						group.status = 'outage';
 					} else if (groupMonitorsDownArr.length > 0) {
 						group.status = 'partial outage';
+					} else if (groupMonitorsUnknownArr.length > 0) {
+						group.status = 'unknown';
 					} else {
 						group.status = 'up';
 					}
@@ -408,10 +443,17 @@ for (var monitor in config.monitors) {
 						return p.up === false;
 					});
 					let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+					let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+						return p.up === undefined;
+					});
+					let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+
 					if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
 						group.status = 'outage';
 					} else if (groupMonitorsDownArr.length > 0) {
 						group.status = 'partial outage';
+					} else if (groupMonitorsUnknownArr.length > 0) {
+						group.status = 'unknown';
 					} else {
 						group.status = 'up';
 					}
