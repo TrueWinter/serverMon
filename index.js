@@ -176,7 +176,7 @@ function ping(monitor, host, cb) {
 					group.status = 'outage';
 				} else if (groupMonitorsDownArr.length > 0) {
 					group.status = 'partial outage';
-				} else if (groupMonitorsUnknown.length > 0) {
+				} else if (groupMonitorsUnknown > 0) {
 					group.status = 'unknown';
 				} else {
 					group.status = 'up';
@@ -257,7 +257,7 @@ function ping(monitor, host, cb) {
 				group.status = 'outage';
 			} else if (groupMonitorsDownArr.length > 0) {
 				group.status = 'partial outage';
-			} else if (groupMonitorsUnknown.length > 0) {
+			} else if (groupMonitorsUnknown > 0) {
 				group.status = 'unknown';
 			} else {
 				group.status = 'up';
@@ -357,7 +357,7 @@ for (var monitor in config.monitors) {
 							group.status = 'outage';
 						} else if (groupMonitorsDownArr.length > 0) {
 							group.status = 'partial outage';
-						} else if (groupMonitorsUnknown.length > 0) {
+						} else if (groupMonitorsUnknown > 0) {
 							group.status = 'unknown';
 						} else {
 							group.status = 'up';
@@ -382,7 +382,7 @@ for (var monitor in config.monitors) {
 							group.status = 'outage';
 						} else if (groupMonitorsDownArr.length > 0) {
 							group.status = 'partial outage';
-						} else if (groupMonitorsUnknown.length > 0) {
+						} else if (groupMonitorsUnknown > 0) {
 							group.status = 'unknown';
 						} else {
 							group.status = 'up';
@@ -416,7 +416,7 @@ for (var monitor in config.monitors) {
 						group.status = 'outage';
 					} else if (groupMonitorsDownArr.length > 0) {
 						group.status = 'partial outage';
-					} else if (groupMonitorsUnknown.length > 0) {
+					} else if (groupMonitorsUnknown > 0) {
 						group.status = 'unknown';
 					} else {
 						group.status = 'up';
@@ -440,7 +440,7 @@ for (var monitor in config.monitors) {
 						group.status = 'outage';
 					} else if (groupMonitorsDownArr.length > 0) {
 						group.status = 'partial outage';
-					} else if (groupMonitorsUnknown.length > 0) {
+					} else if (groupMonitorsUnknown > 0) {
 						group.status = 'unknown';
 					} else {
 						group.status = 'up';
