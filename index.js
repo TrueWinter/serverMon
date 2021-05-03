@@ -344,10 +344,10 @@ for (var monitor in config.monitors) {
 					config.monitors[mon]._remoteData = data.data;
 					config.monitors[mon].up = data.data.up;
 
-					if (config.monitors[monitor].group) {
-						let group = config.groups[config.monitors[monitor].group];
+					if (config.monitors[mon].group) {
+						let group = config.groups[config.monitors[mon].group];
 						let groupMonitors = filterObject(config.monitors, function(p) {
-							return p.group === config.monitors[monitor].group;
+							return p.group === config.monitors[mon].group;
 						});
 						let groupMonitorsArr = Object.keys(groupMonitors);
 						let groupMonitorsDown = filterObject(groupMonitors, function(p) {
@@ -371,10 +371,10 @@ for (var monitor in config.monitors) {
 					}
 				}).catch(function(err) {
 					config.monitors[mon].up = undefined;
-					if (config.monitors[monitor].group) {
-						let group = config.groups[config.monitors[monitor].group];
+					if (config.monitors[mon].group) {
+						let group = config.groups[config.monitors[mon].group];
 						let groupMonitors = filterObject(config.monitors, function(p) {
-							return p.group === config.monitors[monitor].group;
+							return p.group === config.monitors[mon].group;
 						});
 						let groupMonitorsArr = Object.keys(groupMonitors);
 						let groupMonitorsDown = filterObject(groupMonitors, function(p) {
@@ -407,10 +407,10 @@ for (var monitor in config.monitors) {
 				config.monitors[mon]._remoteData = data.data;
 				config.monitors[mon].up = data.data.up;
 
-				if (config.monitors[monitor].group) {
-					let group = config.groups[config.monitors[monitor].group];
+				if (config.monitors[mon].group) {
+					let group = config.groups[config.monitors[mon].group];
 					let groupMonitors = filterObject(config.monitors, function(p) {
-						return p.group === config.monitors[monitor].group;
+						return p.group === config.monitors[mon].group;
 					});
 					let groupMonitorsArr = Object.keys(groupMonitors);
 					let groupMonitorsDown = filterObject(groupMonitors, function(p) {
@@ -433,10 +433,10 @@ for (var monitor in config.monitors) {
 					}
 				}
 			}).catch(function(err) {
-				if (config.monitors[monitor].group) {
-					let group = config.groups[config.monitors[monitor].group];
+				if (config.monitors[mon].group) {
+					let group = config.groups[config.monitors[mon].group];
 					let groupMonitors = filterObject(config.monitors, function(p) {
-						return p.group === config.monitors[monitor].group;
+						return p.group === config.monitors[mon].group;
 					});
 					let groupMonitorsArr = Object.keys(groupMonitors);
 					let groupMonitorsDown = filterObject(groupMonitors, function(p) {
