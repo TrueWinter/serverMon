@@ -3,8 +3,8 @@ var fs = require('fs');
 function runMigration(configFile, cb) {
 	var config = require(configFile); // Load the data from the config file
 
-	if (!Object.prototype.hasOwnProperty.call(config.additional, 'addGroupHiding')) {
-		config.additional.addGroupHiding = true;
+	if (!Object.prototype.hasOwnProperty.call(config.additional, 'enableGroupHiding')) {
+		config.additional.enableGroupHiding = true;
 	}
 
 	// Save data
