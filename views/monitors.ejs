@@ -24,6 +24,7 @@
 		<% var monObj = {} %>
 		<% for (var group in groups) { %>
 			<% monObj[group] = { group: true, groupData: groups[group], members: {} } %>
+			<% monObj[group].groupData.id = group %>
 
 			<% for (var monitor in monitors) { %>
 				<% if (groups[group].members.includes(monitor)) { %>
@@ -56,8 +57,12 @@
 						<% monCounter++ %>
 						<% var monLast = Object.keys(monObj).length === monCounter %>
 						<% if (monObj[mon].groupData) { %>
-							<tr class="group-heading">
-								<td colspan="2"><%= monObj[mon].groupData.name %></td>
+							<tr class="group-heading" data-group-id="<%= monObj[mon].groupData.id %>">
+								<% if (enableGroupHiding) { %>
+									<td colspan="2"><i class="chevron" onclick="toggleGroupVisibility(this)"></i><span class="group-name"><%= monObj[mon].groupData.name %></span></td>
+								<% } else { %>
+									<td colspan="2"><%= monObj[mon].groupData.name %></td>
+								<% } %>
 								<td><%= monObj[mon].groupData.status === undefined ? 'unknown' : monObj[mon].groupData.status %></td>
 								<td>group</td>
 							</tr>
@@ -66,7 +71,11 @@
 								<% monObj[mon].members[member].up === true ? monObj[mon].members[member].state = 'up' : monObj[mon].members[member].up === undefined ? monObj[mon].members[member].state = 'unknown' : monObj[mon].members[member].state = 'down' %>
 								<% memberCounter++ %>
 								<% var last = Object.keys(monObj[mon].members).length === memberCounter %>
-								<tr>
+								<% if (enableGroupHiding) { %>
+									<tr class="group-member hidden" data-member-of="<%= monObj[mon].groupData.id %>">
+								<% } else { %>
+									<tr>
+								<% } %>
 									<% if (!last) { %>
 										<td class="group-indent"></td>
 									<% } else { %>
@@ -93,5 +102,30 @@
 				</tbody>
 			</table>
 		</div>
+		<script>
+			function toggleGroupVisibility(e) {
+				var _groupId = e.parentElement.parentElement.getAttribute('data-group-id');
+				var _groupMembers = document.querySelectorAll('[data-member-of="'+_groupId+'"]');
+
+				if (e.classList.contains('rotated-chevron')) {
+					e.classList.remove('rotated-chevron');
+					e.classList.add('rotated-chevron-back');
+				} else if (e.classList.contains('rotated-chevron-back')) {
+					e.classList.remove('rotated-chevron-back');
+					e.classList.add('rotated-chevron');
+				} else {
+					e.classList.add('rotated-chevron');
+				}
+
+				for (var i = 0; i < _groupMembers.length; i++) {
+					var _isHidden = _groupMembers[i].classList.contains('hidden');
+					if (_isHidden) {
+						_groupMembers[i].classList.remove('hidden');
+					} else {
+						_groupMembers[i].classList.add('hidden');
+					}
+				}
+			}
+		</script>
 	</body>
 </html>

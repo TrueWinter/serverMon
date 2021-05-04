@@ -52,8 +52,58 @@
 	}
 	.group-heading {
 		font-weight: bold;
+		background-color: #2d3035 !important;
 	}
 	tr:nth-child(even) {
 		background-color: #2c2c2c;
+	}
+
+	.chevron {
+		float: left;
+		margin-left: 0.3em;
+	}
+
+	.group-name {
+		margin-left: -0.9em;
+	}
+
+	/* https://stackoverflow.com/a/27492402 */
+	.chevron::before {
+		position: relative;
+		content: "";
+		display: inline-block;
+		/* By using an em scale, the arrows will size with the font */
+		width: 0.6em;
+		height: 0.6em;
+		border-right: 0.2em solid white;
+		border-top: 0.2em solid white;
+		transform: rotate(45deg);
+		cursor: pointer;
+	}
+
+	.chevron:hover::before {
+		border-color: #d955ff; /* For the arrow (which is a border) */
+	}
+
+	@keyframes rotateChevron {
+		0% { transform: rotate(45deg); }
+		100% { transform: rotate(135deg); }
+	}
+	@keyframes rotateChevronBack {
+		0% { transform: rotate(135deg); }
+		100% { transform: rotate(45deg); }
+	}
+	.rotated-chevron::before {
+		animation: rotateChevron 0.2s linear;
+		animation-fill-mode: forwards;
+		border-color: #d955ff !important;
+	}
+	.rotated-chevron-back::before {
+		animation: rotateChevronBack 0.2s linear;
+		animation-fill-mode: forwards;
+	}
+
+	.hidden {
+		display: none;
 	}
 </style>

@@ -14,6 +14,7 @@ var notificationsConfig = {
 		down: emitted when a monitor is down
 		up: emitted when a monitor previously down monitor is back up
 		aboveAverage: emitted when the average ping is above the 24 hour average
+		groupStatusChange: emitted when the status of a group changes
 	*/
 	subscribedEvents: ['down', 'up', 'ping', 'aboveAverage', 'groupStatusChange']
 };

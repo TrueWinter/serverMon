@@ -547,7 +547,7 @@ app.get('/ping/:monitor', function(req, res) {
 });
 
 app.get('/monitors', function(req, res) {
-	res.render('monitors', { monitors: config.monitors, customLogin: config.customLogic.auth ? true : false, groups: config.groups });
+	res.render('monitors', { monitors: config.monitors, customLogin: config.customLogic.auth ? true : false, groups: config.groups, enableGroupHiding: config.additional.enableGroupHiding });
 });
 
 app.get('/api/ping/:monitor', function(req, res) {
