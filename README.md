@@ -39,7 +39,7 @@ Configuring the notifications object in the config file will allow you to receiv
 
 A random delay (between 20ms and 500ms, by default) is added before each check. This is to prevent issues that may occur when a large number of monitors are configured, and can be modified if needed.
 
-Groups can also be configured. A monitor can only be in one group. Currently this only applies to the web UI, and is a beta feature.
+Groups can also be configured. A monitor can be in multiple groups. Currently this only applies to the web UI, the `groupStatusChange` event, and the `/api/group/{internal-id}` API route. THis is a beta feature.
 
 It is recommended to use a proxy such as Nginx to proxy port 80 and 443 to ServerMon's port (18514).
 
@@ -70,7 +70,7 @@ function auth(app) {
 	// Include all code needed for a login system here
 }
 
-module.exports = app;
+module.exports = auth;
 ```
 
 There are a few restrictions:

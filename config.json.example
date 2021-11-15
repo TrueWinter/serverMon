@@ -45,8 +45,8 @@
 		}
 	},
 	"additional": {
-		"randomDelayMin": 20,
-		"randomDelayMax": 500
+		"randomDelayMin": 200,
+		"randomDelayMax": 1000
 	},
 	"customLogic": {
 		"auth": "",

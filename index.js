@@ -163,39 +163,45 @@ function ping(monitor, host, cb) {
 
 			config.monitors[monitor].up = false;
 
-			if (config.monitors[monitor].group) {
-				let group = config.groups[config.monitors[monitor].group];
-				let groupMonitors = filterObject(config.monitors, function(p) {
-					return p.group === config.monitors[monitor].group;
-				});
-				let groupMonitorsArr = Object.keys(groupMonitors);
-				let groupMonitorsDown = filterObject(groupMonitors, function(p) {
-					return p.up === false;
-				});
-				let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
-				let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
-					return p.up === undefined;
-				});
-				let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+			if (config.monitors[monitor].groups) {
+				for (var i = 0; i < config.monitors[monitor].groups.length; i++) {
+					let group = config.groups[config.monitors[monitor].groups[i]];
+					let groupMonitors = filterObject(config.monitors, function(p) {
+						if (!p.groups) {
+							return false;
+						}
 
-				let _prevGroupStatus = group.status;
-				if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
-					group.status = 'outage';
-				} else if (groupMonitorsDownArr.length > 0) {
-					group.status = 'partial outage';
-				} else if (groupMonitorsUnknownArr.length > 0) {
-					group.status = 'unknown';
-				} else {
-					group.status = 'up';
-				}
+						return p.groups.includes(config.monitors[monitor].groups[i]);
+					});
+					let groupMonitorsArr = Object.keys(groupMonitors);
+					let groupMonitorsDown = filterObject(groupMonitors, function(p) {
+						return p.up === false;
+					});
+					let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+					let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+						return p.up === undefined;
+					});
+					let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
-				if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
-					var _emitData = {
-						group: config.monitors[monitor].group,
-						monitors: groupMonitorsArr,
-						status: group.status
-					};
-					emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
+					let _prevGroupStatus = group.status;
+					if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
+						group.status = 'outage';
+					} else if (groupMonitorsDownArr.length > 0) {
+						group.status = 'partial outage';
+					} else if (groupMonitorsUnknownArr.length > 0) {
+						group.status = 'unknown';
+					} else {
+						group.status = 'up';
+					}
+
+					if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+						var _emitData = {
+							group: config.monitors[monitor].groups[i],
+							monitors: groupMonitorsArr,
+							status: group.status
+						};
+						emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
+					}
 				}
 			}
 
@@ -256,40 +262,45 @@ function ping(monitor, host, cb) {
 			});
 		}
 
-		if (config.monitors[monitor].group) {
-			let group = config.groups[config.monitors[monitor].group];
-			let groupMonitors = filterObject(config.monitors, function(p) {
-				return p.group === config.monitors[monitor].group;
-			});
-			let groupMonitorsArr = Object.keys(groupMonitors);
-			let groupMonitorsDown = filterObject(groupMonitors, function(p) {
-				return p.up === false;
-			});
-			let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
-			let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
-				return p.up === undefined;
-			});
-			let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+		if (config.monitors[monitor].groups) {
+			for (var i = 0; i < config.monitors[monitor].groups.length; i++) {
+				let group = config.groups[config.monitors[monitor].groups[i]];
+				let groupMonitors = filterObject(config.monitors, function(p) {
+					if (!p.groups) {
+						return false;
+					}
 
-			let _prevGroupStatus = group.status;
-			if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
-				group.status = 'outage';
-			} else if (groupMonitorsDownArr.length > 0) {
-				group.status = 'partial outage';
-			} else if (groupMonitorsUnknownArr.length > 0) {
-				group.status = 'unknown';
-			} else {
-				group.status = 'up';
-			}
+					return p.groups.includes(config.monitors[monitor].groups[i]);
+				});
+				let groupMonitorsArr = Object.keys(groupMonitors);
+				let groupMonitorsDown = filterObject(groupMonitors, function(p) {
+					return p.up === false;
+				});
+				let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+				let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+					return p.up === undefined;
+				});
+				let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
-			if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
-				// eslint-disable-next-line no-redeclare
-				var _emitData = {
-					group: config.monitors[monitor].group,
-					monitors: groupMonitorsArr,
-					status: group.status
-				};
-				emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
+				let _prevGroupStatus = group.status;
+				if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
+					group.status = 'outage';
+				} else if (groupMonitorsDownArr.length > 0) {
+					group.status = 'partial outage';
+				} else if (groupMonitorsUnknownArr.length > 0) {
+					group.status = 'unknown';
+				} else {
+					group.status = 'up';
+				}
+
+				if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+					var _emitData = {
+						group: config.monitors[monitor].groups[i],
+						monitors: groupMonitorsArr,
+						status: group.status
+					};
+					emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
+				}
 			}
 		}
 
@@ -306,7 +317,13 @@ for (var group in config.groups) {
 		if (!Object.prototype.hasOwnProperty.call(config.monitors, member)) {
 			throw new Error(`Group member ${member} does not exist`);
 		}
+
+		if (!Object.prototype.hasOwnProperty.call(config.monitors[member], 'groups')) {
+			config.monitors[member].groups = [];
+		}
+
 		config.monitors[member].group = group;
+		config.monitors[member].groups.push(group);
 	}
 }
 
@@ -369,76 +386,88 @@ for (var monitor in config.monitors) {
 					config.monitors[mon]._remoteData = data.data;
 					config.monitors[mon].up = data.data.up;
 
-					if (config.monitors[mon].group) {
-						let group = config.groups[config.monitors[mon].group];
-						let groupMonitors = filterObject(config.monitors, function(p) {
-							return p.group === config.monitors[mon].group;
-						});
-						let groupMonitorsArr = Object.keys(groupMonitors);
-						let groupMonitorsDown = filterObject(groupMonitors, function(p) {
-							return p.up === false;
-						});
-						let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
-						let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
-							return p.up === undefined;
-						});
-						let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+					if (config.monitors[mon].groups) {
+						for (var i = 0; i < config.monitors[mon].groups.length; i++) {
+							let group = config.groups[config.monitors[mon].groups[i]];
+							let groupMonitors = filterObject(config.monitors, function(p) {
+								if (!p.groups) {
+									return false;
+								}
 
-						let _prevGroupStatus = group.status;
-						if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
-							group.status = 'outage';
-						} else if (groupMonitorsDownArr.length > 0) {
-							group.status = 'partial outage';
-						} else if (groupMonitorsUnknownArr.length > 0) {
-							group.status = 'unknown';
-						} else {
-							group.status = 'up';
-						}
+								return p.groups.includes(config.monitors[mon].groups[i]);
+							});
+							let groupMonitorsArr = Object.keys(groupMonitors);
+							let groupMonitorsDown = filterObject(groupMonitors, function(p) {
+								return p.up === false;
+							});
+							let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+							let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+								return p.up === undefined;
+							});
+							let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
-						if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
-							var _emitData = {
-								group: config.monitors[monitor].group,
-								monitors: groupMonitorsArr,
-								status: group.status
-							};
-							emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
+							let _prevGroupStatus = group.status;
+							if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
+								group.status = 'outage';
+							} else if (groupMonitorsDownArr.length > 0) {
+								group.status = 'partial outage';
+							} else if (groupMonitorsUnknownArr.length > 0) {
+								group.status = 'unknown';
+							} else {
+								group.status = 'up';
+							}
+
+							if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+								var _emitData = {
+									group: config.monitors[monitor].group,
+									monitors: groupMonitorsArr,
+									status: group.status
+								};
+								emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
+							}
 						}
 					}
 				}).catch(function(err) {
 					config.monitors[mon].up = undefined;
-					if (config.monitors[mon].group) {
-						let group = config.groups[config.monitors[mon].group];
-						let groupMonitors = filterObject(config.monitors, function(p) {
-							return p.group === config.monitors[mon].group;
-						});
-						let groupMonitorsArr = Object.keys(groupMonitors);
-						let groupMonitorsDown = filterObject(groupMonitors, function(p) {
-							return p.up === false;
-						});
-						let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
-						let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
-							return p.up === undefined;
-						});
-						let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
+					if (config.monitors[mon].groups) {
+						for (var i = 0; i < config.monitors[mon].groups.length; i++) {
+							let group = config.groups[config.monitors[mon].group[i]];
+							let groupMonitors = filterObject(config.monitors, function(p) {
+								if (!p.groups) {
+									return false;
+								}
 
-						let _prevGroupStatus = group.status;
-						if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
-							group.status = 'outage';
-						} else if (groupMonitorsDownArr.length > 0) {
-							group.status = 'partial outage';
-						} else if (groupMonitorsUnknownArr.length > 0) {
-							group.status = 'unknown';
-						} else {
-							group.status = 'up';
-						}
+								return p.groups.includes(config.monitors[mon].groups[i]);
+							});
+							let groupMonitorsArr = Object.keys(groupMonitors);
+							let groupMonitorsDown = filterObject(groupMonitors, function(p) {
+								return p.up === false;
+							});
+							let groupMonitorsDownArr = Object.keys(groupMonitorsDown);
+							let groupMonitorsUnknown = filterObject(groupMonitors, function(p) {
+								return p.up === undefined;
+							});
+							let groupMonitorsUnknownArr = Object.keys(groupMonitorsUnknown);
 
-						if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
-							var _emitData = {
-								group: config.monitors[monitor].group,
-								monitors: groupMonitorsArr,
-								status: group.status
-							};
-							emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
+							let _prevGroupStatus = group.status;
+							if (groupMonitorsArr.length === groupMonitorsDownArr.length) {
+								group.status = 'outage';
+							} else if (groupMonitorsDownArr.length > 0) {
+								group.status = 'partial outage';
+							} else if (groupMonitorsUnknownArr.length > 0) {
+								group.status = 'unknown';
+							} else {
+								group.status = 'up';
+							}
+
+							if (_prevGroupStatus !== undefined && _prevGroupStatus !== group.status) {
+								var _emitData = {
+									group: config.monitors[monitor].group,
+									monitors: groupMonitorsArr,
+									status: group.status
+								};
+								emitSubscribedEvents(`group:${_emitData.group}`, _emitData, 'groupStatusChange');
+							}
 						}
 					}
 					console.error(err.message);
