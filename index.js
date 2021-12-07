@@ -239,7 +239,7 @@ function ping(monitor, host, cb) {
 				var dataPoints = 0;
 
 				for (var i = 0; i < dbData.length; i++) {
-					if (!isNaN(dbData[i].average) || data[i].average === null) {
+					if (!isNaN(dbData[i].average) || data[i].average !== null) {
 						total += dbData[i].average;
 						dataPoints++;
 					}
