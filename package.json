@@ -25,6 +25,6 @@
     "pushover-notifications": "^1.2.2",
     "random-number-between": "^1.0.3",
     "slimbot": "^5.0.0",
-    "sqlite3": "^4.2.0"
+    "sqlite3": "^5.0.0"
   }
 }
